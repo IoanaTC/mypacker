@@ -11,9 +11,9 @@ typedef uint64_t QWORD;
 
 #define MZ_HEADER 0x5A4D
 
-//PE file format structure - define components
+// PE file format structure - define components
 //
-//DOS header
+// DOS header
 /*
 typedef struct _IMAGE_DOS_HEADER 
 {
@@ -43,4 +43,25 @@ typedef struct _IMAGE_DOS_HEADER
 
 }IMAGE_DOS_HEADER, *PIMAGE_DOS_HEADER;
 */
+
+// NT Headers
+//
+/*
+typedef struct _IMAGE_NT_HEADERS 
+{
+    DWORD Signature;
+    IMAGE_FILE_HEADER FileHeader;
+    IMAGE_OPTIONAL_HEADER32 OptionalHeader;
+
+} IMAGE_NT_HEADERS32, *PIMAGE_NT_HEADERS32;
+
+typedef struct _IMAGE_NT_HEADERS64 
+{
+    DWORD Signature;
+    IMAGE_FILE_HEADER FileHeader;
+    IMAGE_OPTIONAL_HEADER64 OptionalHeader;
+
+} IMAGE_NT_HEADERS64, *PIMAGE_NT_HEADERS64;
+*/
+
 #endif
