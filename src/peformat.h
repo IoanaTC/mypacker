@@ -5,8 +5,11 @@
 #include <cstdint>
 #include <windows.h>
 
+typedef uint8_t BYTES;
 typedef uint16_t WORD;
 typedef uint64_t QWORD;
+
+#define MZ_HEADER 0x5A4D
 
 //PE file format structure - define components
 //
@@ -33,8 +36,10 @@ typedef struct _IMAGE_DOS_HEADER
     WORD e_oemid;       // OEM identifier
     WORD e_oeminfo;     // OEM information
     WORD e_res2[10];    // reserved words
-                        //
-    WORD e_lfanew;      // file address of new exe header
+    
+// LONG -> signed type, DWOD -> unsigned type (4 bytes)
+// 
+    LONG e_lfanew;      // file address of new exe header
 
 }IMAGE_DOS_HEADER, *PIMAGE_DOS_HEADER;
 */
