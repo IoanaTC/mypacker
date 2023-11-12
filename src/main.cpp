@@ -11,8 +11,8 @@ int main(int argc, char ** argv) {
         return -1;
     }
 
-    PEparser PEparser(executableFile);
-    if(!PEparser.parsePE()) {
+    ParserPE ParserPE(executableFile);
+    if(!ParserPE.parsePE()) {
         printf("[!] Error : Could not parse PE.\n");
         return -1;
     }

@@ -5,7 +5,7 @@
 #include <cstdint>
 #include <windows.h>
 
-typedef uint8_t BYTES;
+typedef unsigned char BYTE;
 typedef uint16_t WORD;
 typedef uint64_t QWORD;
 
