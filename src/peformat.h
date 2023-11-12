@@ -71,6 +71,49 @@ typedef struct _IMAGE_NT_HEADERS64
     IMAGE_OPTIONAL_HEADER64 OptionalHeader;
 
 } IMAGE_NT_HEADERS64, *PIMAGE_NT_HEADERS64;
+//
+//
+// IMAGE_FILE_HEADER
+//
+/*
+typedef struct _IMAGE_FILE_HEADER {     
+  
+    WORD    Machine;     
+    WORD    NumberOfSections;     
+    DWORD   TimeDateStamp;     
+    DWORD   PointerToSymbolTable;     
+    DWORD   NumberOfSymbols;     
+    WORD    SizeOfOptionalHeader;     
+    WORD    Characteristics; 
+    
+} IMAGE_FILE_HEADER, *PIMAGE_FILE_HEADER;
+*/
+//
+//
+//
+// Section Headers
+//
+//
+/*
+typedef struct _IMAGE_SECTION_HEADER {     
+    
+    BYTE    Name[IMAGE_SIZEOF_SHORT_NAME];     
+    
+    union {             
+        DWORD   PhysicalAddress;             
+        DWORD   VirtualSize;     
+    } Misc;     
+    
+    DWORD   VirtualAddress;     
+    DWORD   SizeOfRawData;     
+    DWORD   PointerToRawData;     
+    DWORD   PointerToRelocations;     
+    DWORD   PointerToLinenumbers;     
+    WORD    NumberOfRelocations;     
+    WORD    NumberOfLinenumbers;     
+    DWORD   Characteristics; 
+
+} IMAGE_SECTION_HEADER, *PIMAGE_SECTION_HEADER;
 */
 
 #endif
