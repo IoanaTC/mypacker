@@ -10,6 +10,8 @@ typedef uint16_t WORD;
 typedef uint64_t QWORD;
 
 #define MZ_HEADER 0x5A4D
+#define PEof32 0x10B
+#define PEof64 0x20B
 
 // PE file format structure - define components
 
