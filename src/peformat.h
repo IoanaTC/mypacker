@@ -10,9 +10,11 @@ typedef uint16_t WORD;
 typedef uint64_t QWORD;
 
 #define MZ_HEADER 0x5A4D
-#define PE_HEADER 
 
 // PE file format structure - define components
+
+//PE file format structure - define components
+n
 //
 // DOS header
 /*

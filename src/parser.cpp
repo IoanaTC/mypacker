@@ -80,6 +80,7 @@ bool PEparser::readDosHeader() {
 
     //printf("%04X, %04X\n", getWordLE(&dosHeader.e_magic, 0), dosHeader.e_magic);
 
+
     unsigned char* magic = reinterpret_cast<unsigned char*>(&dosHeader.e_magic);
     printf("%c %c\n", magic[0], magic[1]);
 
@@ -88,6 +89,7 @@ bool PEparser::readDosHeader() {
     printf("%c %c\n", magic2[0], magic2[1]);
 
     //printf("%08X, %08X\n", getDwordLE(&dosHeader.e_lfanew, 0), dosHeader.e_lfanew);
+
     if(getWordLE(&dosHeader.e_magic, 0) != MZ_HEADER){
         // file does not have the MZ header
         printf("[!] Error: Current file does not have the MZ header.\n");
@@ -112,6 +114,7 @@ bool PEparser::readDosStub() {
     // get size of DOS STUB
     
     printf("[-] Reading DOS Stub ...\n");
+
 
     if(!dosHeader.e_lfanew) {
 
@@ -142,7 +145,6 @@ bool PEparser::readDosStub() {
 
         return false;
     }
-
 
     if(!ReadFile(inputFile, dosStub, sizeofDosStub, &bytesRead, NULL)) {
         printf("[!] Error: Could not read DOS Stub.\n");
@@ -187,7 +189,13 @@ bool PEparser::readNTHeaders(){
     }
 
     // read PE - Signature
+/*
+    for (DWORD i = 0; i < sizeofDosStub; i++) {     
+        printf("%02X ", dosStub[i]); } 
+    printf("\n");
+*/
 
+    return true;
 }
 
 /*
