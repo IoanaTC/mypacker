@@ -2,25 +2,26 @@
 #define PE_PARSER_H
 
 #include "peformat.h"
+#include <stdexcept>
 #include <windows.h>
+#include <string>
 
-
-class PEparser
+class ParserPE
 {
     public:
         IMAGE_DOS_HEADER dosHeader;
-        BYTES* dosStub;
+        BYTE* dosStub;
         void* ntHeaders;
 
 //        void* ntHeaders;
 
         HANDLE inputFile;
 
-        PEparser(HANDLE inputFile);
+        ParserPE(HANDLE inputFile);
         bool parsePE();
 
 
-        ~PEparser();
+        ~ParserPE();
 
     private:
 
@@ -30,5 +31,24 @@ class PEparser
 
         bool readNTHeaders();
 };
+
+typedef class _PARSER_EXCEPTION : public std::exception 
+{
+    private:
+
+        std::string errorMessage;
+
+    public:
+        explicit _PARSER_EXCEPTION(const char* error) : errorMessage(error) {} 
+        _PARSER_EXCEPTION()=delete;
+
+        virtual ~_PARSER_EXCEPTION() noexcept = default;
+
+        const char* what() const noexcept override {
+            // .data -> returns content of string
+            // doea not guarantee null-termination
+            return errorMessage.c_str();
+        }
+}PARSER_EXCEPTION;
 
 #endif
