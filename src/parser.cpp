@@ -89,6 +89,7 @@ bool PEparser::readDosHeader() {
 
     //printf("%08X, %08X\n", getDwordLE(&dosHeader.e_lfanew, 0), dosHeader.e_lfanew);
     //
+
     if(getWordLE(&dosHeader.e_magic, 0) != MZ_HEADER){
         // file does not have the MZ header
         printf("[!] Error: Current file does not have the MZ header.\n");
