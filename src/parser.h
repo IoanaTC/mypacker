@@ -12,7 +12,6 @@ class PEparser
         BYTES* dosStub;
         void* ntHeaders;
 
-
         HANDLE inputFile;
 
         PEparser(HANDLE inputFile);
@@ -26,7 +25,6 @@ class PEparser
         bool readDosHeader();
         bool readDosStub();
         bool readNTHeaders();
-
 };
 
 #endif
