@@ -24,7 +24,7 @@ static uint32_t getDwordLE(const void *pData, int index) {
     const unsigned char *pdata = static_cast<const unsigned char *>(pData);
 
     if(index > pointerSize - 3) {
-        printf("[!] Error: Index must be smaller than %d\n", pointerSize);
+        printf("[!] Error: Index must be smaller than %d\n", pointerSize);  
         return 0;
     }
     return pdata[index + 0] | (unsigned (pdata[index + 1]) << 8) | (unsigned (pdata[index + 2]) << 16) | (unsigned (pdata[index + 3]) << 24); 
@@ -79,6 +79,17 @@ bool PEparser::readDosHeader() {
     // get DOS magic - MZ
 
     //printf("%04X, %04X\n", getWordLE(&dosHeader.e_magic, 0), dosHeader.e_magic);
+
+    unsigned char* magic = reinterpret_cast<unsigned char*>(&dosHeader.e_magic);
+    printf("%c %c\n", magic[0], magic[1]);
+
+    uint16_t magicValue =  getWordLE(&dosHeader.e_magic, 0);
+    unsigned char* magic2 = reinterpret_cast<unsigned char*>(&magicValue);
+    printf("%c %c\n", magic2[0], magic2[1]);
+
+    //printf("%08X, %08X\n", getDwordLE(&dosHeader.e_lfanew, 0), dosHeader.e_lfanew);
+    //
+
     if(getWordLE(&dosHeader.e_magic, 0) != MZ_HEADER){
         // file does not have the MZ header
         printf("[!] Error: Current file does not have the MZ header.\n");
@@ -104,11 +115,18 @@ bool PEparser::readDosStub() {
     
     printf("[-] Reading DOS Stub ...\n");
 
-    if(!dosHeader.e_magic) {
+    if(!dosHeader.e_lfanew) {
 
-        // este nevoie de dosHeader.e_lfanew
+        // dosHeader.e_lfanew is necessary, 
+        // there starts new executable file address
 
         printf("[!] Error: Could not read DOS Stub, as DOS Header was not read successfully.\n");
+        return false;
+    }
+
+    if(SetFilePointer(inputFile, sizeof(IMAGE_DOS_HEADER), NULL, FILE_BEGIN) == INVALID_SET_FILE_POINTER) {
+
+        printf("[!] Error: Could not move file pointer to DOS Stub.\n");
         return false;
     }
 
@@ -120,15 +138,6 @@ bool PEparser::readDosStub() {
 
     if(!dosStub) {
         printf("[!] Error: Could not allocate memory for DOS Stub.\n");
-
-        free(dosStub);
-        dosStub = NULL;
-
-        return false;
-    }
-
-    if(SetFilePointer(inputFile, sizeof(IMAGE_DOS_HEADER), NULL, FILE_BEGIN) == INVALID_SET_FILE_POINTER) {
-        printf("[!] Error: Could not move file pointer to DOS Stub.\n");
 
         free(dosStub);
         dosStub = NULL;
@@ -156,6 +165,29 @@ bool PEparser::readDosStub() {
 
     printf("[-] DOS Stub successfully read.\n");
     printf("[^] DOS Stub: \n", *dosStub);
+
+    for (DWORD i = 0; i < sizeofDosStub; i++) {     
+        printf("%02X ", dosStub[i]); } 
+    printf("\n");
+
+    return true;
+}
+bool PEparser::readNTHeaders(){
+   
+    printf("[-] Reading NT Headers ...");
+    
+    if(!dosHeader.e_lfanew) {
+        printf("[!] Error: Could not read NT Headers, as DOS Header was not read successfully.\n");
+        return false;
+    }
+
+    if(SetFilePointer(inputFile, dosHeader.e_lfanew, NULL, FILE_BEGIN) == INVALID_SET_FILE_POINTER) {
+
+        printf("[!] Error: Could not move file pointer to NT Headers.\n");
+        return false;
+    }
+
+    // read PE - Signature
 /*
     for (DWORD i = 0; i < sizeofDosStub; i++) {     
         printf("%02X ", dosStub[i]); } 

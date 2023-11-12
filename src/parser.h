@@ -10,6 +10,9 @@ class PEparser
     public:
         IMAGE_DOS_HEADER dosHeader;
         BYTES* dosStub;
+        void* ntHeaders;
+
+        void* ntHeaders;
 
         HANDLE inputFile;
 
@@ -23,7 +26,9 @@ class PEparser
 
         bool readDosHeader();
         bool readDosStub();
+        bool readNTHeaders();
 
+        bool readNTHeaders();
 };
 
 #endif
