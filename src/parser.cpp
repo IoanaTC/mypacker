@@ -10,8 +10,6 @@ static const int pointerSize = sizeof(void*);
 
 static uint16_t getWordLE(const void *pData, int index) {     
     const unsigned char *pdata = static_cast<const unsigned char *>(pData);
-    //printf("from getwordle: %04X\n", (pdata[index + 0]<<8 | (unsigned (pdata[index + 1]))));
-    //printf("pData = %X\n", pdata[10]);
     
     if(index > pointerSize - 2) {
 
@@ -56,17 +54,17 @@ ParserPE::ParserPE(HANDLE inputFile) {
 // parser for DOS HEADER
 bool ParserPE::readDosHeader() {
 
-    printf("[-] Reading DOS Header ...\n");
+    printf("[+] Reading DOS Header ...\n");
 
     DWORD bytesRead = 0;
 
     if(!ReadFile(inputFile, &dosHeader, sizeof(IMAGE_DOS_HEADER), &bytesRead, NULL)) {
-        printf("[!] Error: Could not read DOS Header.\n");
+        printf("[-] Error: Could not read DOS Header.\n");
         return false;
     }
 
     if(bytesRead != sizeof(IMAGE_DOS_HEADER)) {
-        printf("[!] Error: Could not read DOS Header entirely.\n");
+        printf("[-] Error: Could not read DOS Header entirely.\n");
         return false;
     }
     
@@ -80,7 +78,7 @@ bool ParserPE::readDosHeader() {
         
         if(getWordLE(&dosHeader.e_magic, 0) != MZ_HEADER){
             // file does not have the MZ header
-            printf("[!] Error: Current file does not have the MZ header.\n");
+            printf("[-] Error: Current file does not have the MZ header.\n");
             return false;
         }
     } catch (const PARSER_EXCEPTION& e) {
@@ -98,8 +96,8 @@ bool ParserPE::readDosHeader() {
         return false;
     }
 
-    printf("[-] Data correctly extracted from DOS Header.\n");
-    printf("[^] dosHeader.e_lfanew : %04X\n", dosHeader.e_lfanew);
+    //printf("[+] Data correctly extracted from DOS Header.\n");
+    //printf("[+] dosHeader.e_lfanew : %04X\n", dosHeader.e_lfanew);
     return true;
 }
 
@@ -107,38 +105,38 @@ bool ParserPE::readDosHeader() {
 bool ParserPE::readDosStub() {
     // get size of DOS STUB
     
-    printf("[-] Reading DOS Stub ...\n");
+    printf("[+] Reading DOS Stub ...\n");
 
     if(!dosHeader.e_lfanew) {
 
         // dosHeader.e_lfanew is necessary, 
         // there starts new executable file address
 
-        printf("[!] Error: Could not read DOS Stub, as DOS Header was not read successfully.\n");
+        printf("[-] Error: Could not read DOS Stub, as DOS Header was not read successfully.\n");
         return false;
     }
 
     if(SetFilePointer(inputFile, sizeof(IMAGE_DOS_HEADER), NULL, FILE_BEGIN) == INVALID_SET_FILE_POINTER) {
 
-        printf("[!] Error: Could not move file pointer to DOS Stub.\n");
+        printf("[-] Error: Could not move file pointer to DOS Stub.\n");
         return false;
     }
 
     DWORD bytesRead = 0;
     DWORD sizeofDosStub = (DWORD)(dosHeader.e_lfanew - sizeof(IMAGE_DOS_HEADER));
 
-    printf("[^] sizeofDosStub: %04X\n", sizeofDosStub);
+    printf("[-] sizeofDosStub: %04X\n", sizeofDosStub);
     dosStub = (BYTE*)(malloc(sizeofDosStub));
 
     if(!dosStub) {
-        printf("[!] Error: Could not allocate memory for DOS Stub.\n");
+        printf("[-] Error: Could not allocate memory for DOS Stub.\n");
 
         dosStub = NULL;
         return false;
     }
 
     if(!ReadFile(inputFile, dosStub, sizeofDosStub, &bytesRead, NULL)) {
-        printf("[!] Error: Could not read DOS Stub.\n");
+        printf("[-] Error: Could not read DOS Stub.\n");
 
         free(dosStub);
         dosStub = NULL;
@@ -155,17 +153,17 @@ bool ParserPE::readDosStub() {
         return false;
     }
 
-    printf("[-] DOS Stub successfully read.\n");
-    printf("[^] DOS Stub: \n", *dosStub);
+    printf("[+] DOS Stub successfully read.\n");
+    //printf("[^] DOS Stub: \n", *dosStub);
 
     return true;
 }
 bool ParserPE::readNTHeaders(){
    
-    printf("[-] Reading NT Headers ...");
+    printf("[+] Reading NT Headers ...\n");
     
     if(!dosHeader.e_lfanew) {
-        printf("[!] Error: Could not read NT Headers, as DOS Header was not read successfully.\n");
+        printf("[-] Error: Could not read NT Headers, as DOS Header was not read successfully.\n");
         return false;
     }
     
@@ -196,7 +194,7 @@ bool ParserPE::readNTHeaders(){
 
     if(SetFilePointer(inputFile, dosHeader.e_lfanew, NULL, FILE_BEGIN) == INVALID_SET_FILE_POINTER) {
 
-        printf("[!] Error: Could not move file pointer to NT Headers.\n");
+        printf("[-] Error: Could not move file pointer to NT Headers.\n");
         return false;
     }
 
@@ -213,7 +211,6 @@ bool ParserPE::readNTHeaders(){
     }
     else if(optionalMagic == PEof64) {
         // 64 bit PE
-        
 
         this->ntHeaders = &ntHeaders64;
         if(!ReadFile(inputFile, &ntHeaders64, sizeof(IMAGE_NT_HEADERS64), &bytesRead, NULL)) {
@@ -253,13 +250,13 @@ static void coutDOSheader(ParserPE *parser) {
 // main parser
 bool ParserPE::parsePE() {
 
-    printf("[-] Parsing PE ...\n");
+    printf("[+] Parsing PE ...\n");
     if(!readDosHeader()) {
-        printf("[!] Error: Could not read DOS Header.\n");
+        printf("[-] Error: Could not read DOS Header.\n");
         return false;
     }
     
-    printf("[-] Successfully read DOS Header.\n");
+    printf("[+] Successfully read DOS Header.\n");
 /*
     if(!readDosStub()) {
         printf("[!] Error: Could not read DOS Stub.\n");
@@ -268,7 +265,7 @@ bool ParserPE::parsePE() {
     printf("[-] Successfully read DOS Stub.\n");
 */
     if(!readNTHeaders()) {
-        printf("[-] Error: Could not  read NT Headers\n");
+        printf("[-] Error: Could not read NT Headers.\n");
         return false;
     }
     printf("[-] Successfully read NT Headers.\n");

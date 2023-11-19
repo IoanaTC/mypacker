@@ -15,7 +15,6 @@ class ParserPE
         void* ntHeaders;
         IMAGE_NT_HEADERS32 ntHeaders32;
         IMAGE_NT_HEADERS64 ntHeaders64;
-//        void* ntHeaders;
 
         HANDLE inputFile;
 
