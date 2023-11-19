@@ -262,13 +262,13 @@ bool ParserPE::parsePE() {
         printf("[!] Error: Could not read DOS Stub.\n");
         return false;
     }
-    printf("[-] Successfully read DOS Stub.\n");
+    printf("[+] Successfully read DOS Stub.\n");
 */
     if(!readNTHeaders()) {
         printf("[-] Error: Could not read NT Headers.\n");
         return false;
     }
-    printf("[-] Successfully read NT Headers.\n");
+    printf("[+] Successfully read NT Headers.\n");
     return true;
 }
 
