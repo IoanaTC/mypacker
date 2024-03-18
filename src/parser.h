@@ -21,16 +21,15 @@ class ParserPE
         ParserPE(HANDLE inputFile);
         bool parsePE();
 
-
         ~ParserPE();
 
     private:
 
         bool readDosHeader();
         bool readDosStub();
-//       bool readNTHeaders();
 
         bool readNTHeaders();
+        bool readSectionHeader();
 };
 
 typedef class _PARSER_EXCEPTION : public std::exception 
