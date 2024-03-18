@@ -170,6 +170,8 @@ bool ParserPE::readNTHeaders(){
     // first, verify if PE32 or PE32+
     DWORD bytesRead = 0;
 
+
+
     if(SetFilePointer(inputFile, dosHeader.e_lfanew + sizeof(DWORD) + sizeof(IMAGE_FILE_HEADER), NULL, FILE_BEGIN) == INVALID_SET_FILE_POINTER) {
 
         printf("[-] Error: Could not find Optional Header Magic\n");
