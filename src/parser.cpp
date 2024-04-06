@@ -72,8 +72,6 @@ bool ParserPE::readDosHeader() {
     //
     // get DOS magic - MZ
 
-    BYTE* magic = (BYTE*)(&dosHeader.e_magic);
-
     try {
         
         if(getWordLE(&dosHeader.e_magic, 0) != MZ_HEADER){
@@ -86,7 +84,7 @@ bool ParserPE::readDosHeader() {
         return false;
     }
 
-    // TODO: check other dos values
+    // TODO: check other dos values (in trecut) :)))) (azi)
     
     try {
 
@@ -96,13 +94,15 @@ bool ParserPE::readDosHeader() {
         return false;
     }
 
-    //printf("[+] Data correctly extracted from DOS Header.\n");
-    //printf("[+] dosHeader.e_lfanew : %04X\n", dosHeader.e_lfanew);
+    printf("[+] Data correctly extracted from DOS Header.\n");
     return true;
 }
 
 //parser for DOS STUB
 bool ParserPE::readDosStub() {
+    // temporary call treat compiler errors TODO
+    getQwordLE(&dosHeader, 0);
+
     // get size of DOS STUB
     
     printf("[+] Reading DOS Stub ...\n");
@@ -125,7 +125,6 @@ bool ParserPE::readDosStub() {
     DWORD bytesRead = 0;
     DWORD sizeofDosStub = (DWORD)(dosHeader.e_lfanew - sizeof(IMAGE_DOS_HEADER));
 
-    printf("[-] sizeofDosStub: %04X\n", sizeofDosStub);
     dosStub = (BYTE*)(malloc(sizeofDosStub));
 
     if(!dosStub) {
@@ -158,6 +157,7 @@ bool ParserPE::readDosStub() {
 
     return true;
 }
+
 bool ParserPE::readNTHeaders(){
    
     printf("[+] Reading NT Headers ...\n");
@@ -170,8 +170,6 @@ bool ParserPE::readNTHeaders(){
     // first, verify if PE32 or PE32+
     DWORD bytesRead = 0;
 
-
-
     if(SetFilePointer(inputFile, dosHeader.e_lfanew + sizeof(DWORD) + sizeof(IMAGE_FILE_HEADER), NULL, FILE_BEGIN) == INVALID_SET_FILE_POINTER) {
 
         printf("[-] Error: Could not find Optional Header Magic\n");
@@ -180,6 +178,7 @@ bool ParserPE::readNTHeaders(){
 
     WORD optionalMagic = 0;
     try {
+
         if(!ReadFile(inputFile, &optionalMagic, sizeof(WORD), &bytesRead, NULL)) {
             
             printf("[-] Error: Could not read Optional Header magic\n");
@@ -191,7 +190,6 @@ bool ParserPE::readNTHeaders(){
 
         printf("[-] Error: %s\n", e.what());
         return false;
-
     }
 
     if(SetFilePointer(inputFile, dosHeader.e_lfanew, NULL, FILE_BEGIN) == INVALID_SET_FILE_POINTER) {
@@ -211,6 +209,7 @@ bool ParserPE::readNTHeaders(){
             return false;
         }
     }
+
     else if(optionalMagic == PEof64) {
         // 64 bit PE
 
