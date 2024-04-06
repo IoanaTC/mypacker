@@ -133,20 +133,68 @@ BOOL PE_PARSER::parseNTHeaders(){
     if(optionalMagic == _IMAGE_NT_HDR32_MAGIC) {
         // 32 bit PE
         //
-        this->NT_HEADERS = &NT_HEADERS32;
         if(!ReadFile(inputFile, &NT_HEADERS32, sizeof(IMAGE_NT_HEADERS32), &bytesRead, NULL)) {
             throw PARSER_EXCEPTION("[-] Error: Could not read NT Headers\n"); 
         }
+        this->NT_HEADERS = &NT_HEADERS32;
     }
     else if(optionalMagic == _IMAGE_NT_HDR64_MAGIC) {
         // 64 bit PE
         //
-        this->NT_HEADERS = &NT_HEADERS64;
         if(!ReadFile(inputFile, &NT_HEADERS64, sizeof(IMAGE_NT_HEADERS64), &bytesRead, NULL)) {
             throw PARSER_EXCEPTION("[-] Error: Could not read NT Headers\n"); 
         }
+        this->NT_HEADERS = &NT_HEADERS64;
+    }
+    else {
+        throw PARSER_EXCEPTION("[-] Error: this file is a ROM image\n");
     }
     printf("[+] NT Headers successfully read.\n");
+    return true;
+}
+//
+// parse Section Header
+//
+BOOL PE_PARSER::parseSectionHeader() {
+    printf("[+] Parsing Section Header ...\n");
+    //
+    if(!NT_HEADERS || !DOS_HEADER.e_lfanew){
+        throw PARSER_EXCEPTION("[-] Error: Could not find needed headers of PE\n");
+    }
+    WORD numberofSections = getWordLE(&((___PIMAGE_NT_HEADERS32) NT_HEADERS)->FileHeader.NumberOfSections, 0);
+    if(!numberofSections){
+        throw PARSER_EXCEPTION("[-] Error: No sections were registered\n");
+    }
+    //
+    // set file poniter to begining of section header
+    //
+    size_t FAofSections = DOS_HEADER.e_lfanew + sizeof(((___PIMAGE_NT_HEADERS32) NT_HEADERS)->Signature) + 
+                                                sizeof(((___PIMAGE_NT_HEADERS32) NT_HEADERS)->FileHeader) + 
+                                                ((___PIMAGE_NT_HEADERS32) NT_HEADERS)->FileHeader.SizeOfOptionalHeader;
+    if(!FAofSections){
+        throw PARSER_EXCEPTION("[-] Error: Could not compute section header file offset\n");
+    }
+    if(SetFilePointer(inputFile, FAofSections, NULL, FILE_BEGIN) == INVALID_SET_FILE_POINTER) {
+        throw PARSER_EXCEPTION("[-] Error: Could not set file poniter to reach the PE sections\n");
+    }
+    //
+    // allocate memory for array of sections
+    //
+    size_t sizeofSectionHeader = sizeof(___IMAGE_SECTION_HEADER);
+    SECTIONS = (___PIMAGE_SECTION_HEADER) malloc(numberofSections * sizeofSectionHeader);
+    if(!SECTIONS){
+        throw PARSER_EXCEPTION("[-] Error: Could not allocate memory for sections\n");
+    }
+    DWORD bytesRead = 0;
+    for(unsigned int counter = 0; counter < numberofSections; counter++) {
+        if(SetFilePointer(inputFile, counter * sizeofSectionHeader, NULL, FILE_CURRENT)) {
+            throw PARSER_EXCEPTION("[-] Error: Could not set file pointer to beging of current section\n");
+        }
+        if(!ReadFile(inputFile, &SECTIONS[counter], sizeofSectionHeader, &bytesRead, NULL) || bytesRead != sizeofSectionHeader) {
+            throw PARSER_EXCEPTION("[-] Error: Could not read from current file pointer, section header\n");
+        }
+    }
+    printf("[+] Section Header successfully read.\n");
     return true;
 }
 //

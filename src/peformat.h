@@ -17,6 +17,22 @@ typedef uint64_t QWORD;
 //
 #define _IMAGE_DATA_DIRECTORY_NUMBEROF_ENTRIES 16
 //
+#define _IMAGE_DIRECTORY_ENTRY_EXPORT          0   // Export Directory
+#define _IMAGE_DIRECTORY_ENTRY_IMPORT          1   // Import Directory
+#define _IMAGE_DIRECTORY_ENTRY_RESOURCE        2   // Resource Directory
+#define _IMAGE_DIRECTORY_ENTRY_EXCEPTION       3   // Exception Directory
+#define _IMAGE_DIRECTORY_ENTRY_SECURITY        4   // Security Directory
+#define _IMAGE_DIRECTORY_ENTRY_BASERELOC       5   // Base Relocation Table
+#define _IMAGE_DIRECTORY_ENTRY_DEBUG           6   // Debug Directory
+#define _IMAGE_DIRECTORY_ENTRY_ARCHITECTURE    7   // Architecture Specific Data
+#define _IMAGE_DIRECTORY_ENTRY_GLOBALPTR       8   // RVA of GP
+#define _IMAGE_DIRECTORY_ENTRY_TLS             9   // TLS Directory
+#define _IMAGE_DIRECTORY_ENTRY_LOAD_CONFIG    10   // Load Configuration Directory
+#define _IMAGE_DIRECTORY_ENTRY_BOUND_IMPORT   11   // Bound Import Directory in headers
+#define _IMAGE_DIRECTORY_ENTRY_IAT            12   // Import Address Table
+#define _IMAGE_DIRECTORY_ENTRY_DELAY_IMPORT   13   // Delay Load Import Descriptors
+#define _IMAGE_DIRECTORY_ENTRY_COM_DESCRIPTOR 14   // COM Runtime descriptor
+//
 // PE file format structure - define components
 //
 // DOS header
@@ -174,30 +190,26 @@ typedef struct __IMAGE_NT_HEADERS64
 } ___IMAGE_NT_HEADERS64, *___PIMAGE_NT_HEADERS64;
 //
 //
+// Section Header
 //
-// Section Headers
+#define ___IMAGE_SIZEOF_SHORT_NAME 8
 //
-//
-/*
-   typedef struct _IMAGE_SECTION_HEADER {     
+typedef struct __IMAGE_SECTION_HEADER {
 
-   BYTE    Name[IMAGE_SIZEOF_SHORT_NAME];     
+    BYTE    Name[___IMAGE_SIZEOF_SHORT_NAME];
+    union {
+        DWORD   PhysicalAddress;
+        DWORD   VirtualSize;
+    } Misc;
 
-   union {             
-   DWORD   PhysicalAddress;             
-   DWORD   VirtualSize;     
-   } Misc;     
+    DWORD   VirtualAddress;
+    DWORD   SizeOfRawData;
+    DWORD   PointerToRawData;
+    DWORD   PointerToRelocations;
+    DWORD   PointerToLinenumbers;
+    WORD    NumberOfRelocations;
+    WORD    NumberOfLinenumbers;
+    DWORD   Characteristics;
 
-   DWORD   VirtualAddress;     
-   DWORD   SizeOfRawData;     
-   DWORD   PointerToRawData;     
-   DWORD   PointerToRelocations;     
-   DWORD   PointerToLinenumbers;     
-   WORD    NumberOfRelocations;     
-   WORD    NumberOfLinenumbers;     
-   DWORD   Characteristics; 
-
-   } IMAGE_SECTION_HEADER, *PIMAGE_SECTION_HEADER;
-   */
-
+} ___IMAGE_SECTION_HEADER, * ___PIMAGE_SECTION_HEADER;     
 #endif

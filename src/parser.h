@@ -9,12 +9,14 @@
 class PE_PARSER
 {
     private:
-        __IMAGE_DOS_HEADER  DOS_HEADER;
-        __IMAGE_DOS_STUB    DOS_STUB;
+        __IMAGE_DOS_HEADER         DOS_HEADER;
+        __IMAGE_DOS_STUB           DOS_STUB;
 
-        VOID*               NT_HEADERS;                 // currently it represents both 32 and 64 versions of the header
-        IMAGE_NT_HEADERS32  NT_HEADERS32;
-        IMAGE_NT_HEADERS64  NT_HEADERS64;
+        VOID*                      NT_HEADERS;   // both 32 and 64 versions of the header
+        ___IMAGE_NT_HEADERS32      NT_HEADERS32;
+        ___IMAGE_NT_HEADERS64      NT_HEADERS64;
+
+        ___PIMAGE_SECTION_HEADER   SECTIONS;  
 
         HANDLE inputFile;
 
@@ -32,7 +34,7 @@ class PE_PARSER
         BOOL parseDosStub();
 
         BOOL parseNTHeaders();
-        //BOOL parseSectionHeader();
+        BOOL parseSectionHeader();
 };
 
 typedef class _PARSER_EXCEPTION : public std::exception 
