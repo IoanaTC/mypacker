@@ -41,7 +41,7 @@ typedef struct _IMAGE_DOS_HEADER
     WORD e_oeminfo;     // OEM information
     WORD e_res2[10];    // reserved words
     
-// LONG -> signed type, DWOD -> unsigned type (4 bytes)
+// LONG -> signed type, DWORD -> unsigned type (4 bytes)
 // 
     LONG e_lfanew;      // file address of new exe header
 
@@ -75,7 +75,6 @@ typedef struct _IMAGE_NT_HEADERS64
 //
 // IMAGE_FILE_HEADER
 //
-/*
 typedef struct _IMAGE_FILE_HEADER {     
   
     WORD    Machine;     
