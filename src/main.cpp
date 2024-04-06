@@ -119,8 +119,8 @@ int main(int argc, char ** argv) {
             return EXIT_FAILURE;
         }
 
-        ParserPE ParserPE(executableFile);
-        if(!ParserPE.parsePE()) {
+        PE_PARSER PE_PARSER(executableFile);
+        if(!PE_PARSER.parsePE()) {
 
             printf("[!] Error : Could not parse PE.\n");
 

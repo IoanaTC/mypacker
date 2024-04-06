@@ -6,30 +6,33 @@
 #include <windows.h>
 #include <string>
 
-class ParserPE
+class PE_PARSER
 {
-    public:
-        IMAGE_DOS_HEADER dosHeader;
-        BYTE* dosStub;
+    private:
+        __IMAGE_DOS_HEADER  DOS_HEADER;
+        __IMAGE_DOS_STUB    DOS_STUB;
 
-        void* ntHeaders;
-        IMAGE_NT_HEADERS32 ntHeaders32;
-        IMAGE_NT_HEADERS64 ntHeaders64;
+        VOID*               NT_HEADERS;                 // currently it represents both 32 and 64 versions of the header
+        IMAGE_NT_HEADERS32  NT_HEADERS32;
+        IMAGE_NT_HEADERS64  NT_HEADERS64;
 
         HANDLE inputFile;
 
-        ParserPE(HANDLE inputFile);
-        bool parsePE();
+    public:
+        PE_PARSER(HANDLE inputFile);
+        ~PE_PARSER();
 
-        ~ParserPE();
+        static WORD getWordLE(const void* pData, int index);
+        static DWORD getDwordLE(const void* pData, int index);
+        static QWORD getQwordLE(const void* pData, int index);
 
-    private:
+        BOOL parsePE();
 
-        bool readDosHeader();
-        bool readDosStub();
+        BOOL parseDosHeader();
+        BOOL parseDosStub();
 
-        bool readNTHeaders();
-        bool readSectionHeader();
+        BOOL parseNTHeaders();
+        //BOOL parseSectionHeader();
 };
 
 typedef class _PARSER_EXCEPTION : public std::exception 
@@ -45,8 +48,6 @@ typedef class _PARSER_EXCEPTION : public std::exception
         virtual ~_PARSER_EXCEPTION() noexcept = default;
 
         const char* what() const noexcept override {
-            // .data -> returns content of string
-            // doea not guarantee null-termination
             return errorMessage.c_str();
         }
 }PARSER_EXCEPTION;
