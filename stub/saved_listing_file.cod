@@ -6,8 +6,14 @@ INCLUDELIB LIBCMT
 INCLUDELIB OLDNAMES
 
 PUBLIC	?genv@@3UGlobalExternVariables@@A		; genv
+PUBLIC	?load_address@@3_KA				; load_address
+PUBLIC	?original_data_directory@@3U_IMAGE_DATA_DIRECTORY@@A ; original_data_directory
+_BSS	SEGMENT
+?load_address@@3_KA DQ 01H DUP (?)			; load_address
+?original_data_directory@@3U_IMAGE_DATA_DIRECTORY@@A DQ 01H DUP (?) ; original_data_directory
+_BSS	ENDS
 A$A	SEGMENT
-?genv@@3UGlobalExternVariables@@A	ORG $+1		; genv
+?genv@@3UGlobalExternVariables@@A	ORG $+12		; genv
 A$A	ENDS
 PUBLIC	?StubEntryPoint@@YAXXZ				; StubEntryPoint
 ; Function compile flags: /Odtp
@@ -15,9 +21,20 @@ PUBLIC	?StubEntryPoint@@YAXXZ				; StubEntryPoint
 _TEXT	SEGMENT
 ?StubEntryPoint@@YAXXZ PROC				; StubEntryPoint
 
-; 12   : } 
+; 29   :     load_address = (unsigned long long) StubEntryPoint - genv.RVA_to_stub_entry;
 
-  00000	c2 00 00	 ret	 0
+  00000	8b 05 00 00 00
+	00		 mov	 eax, DWORD PTR ?genv@@3UGlobalExternVariables@@A
+  00006	48 8d 0d 00 00
+	00 00		 lea	 rcx, OFFSET FLAT:?StubEntryPoint@@YAXXZ ; StubEntryPoint
+  0000d	48 2b c8	 sub	 rcx, rax
+  00010	48 8b c1	 mov	 rax, rcx
+  00013	48 89 05 00 00
+	00 00		 mov	 QWORD PTR ?load_address@@3_KA, rax ; load_address
+
+; 30   : } 
+
+  0001a	c3		 ret	 0
 ?StubEntryPoint@@YAXXZ ENDP				; StubEntryPoint
 _TEXT	ENDS
 END
