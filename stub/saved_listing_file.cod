@@ -7,10 +7,8 @@ INCLUDELIB OLDNAMES
 
 PUBLIC	?genv@@3UGlobalExternVariables@@A		; genv
 PUBLIC	?load_address@@3_KA				; load_address
-PUBLIC	?original_data_directory@@3U_IMAGE_DATA_DIRECTORY@@A ; original_data_directory
 _BSS	SEGMENT
 ?load_address@@3_KA DQ 01H DUP (?)			; load_address
-?original_data_directory@@3U_IMAGE_DATA_DIRECTORY@@A DQ 01H DUP (?) ; original_data_directory
 _BSS	ENDS
 A$A	SEGMENT
 ?genv@@3UGlobalExternVariables@@A	ORG $+12		; genv
@@ -21,7 +19,7 @@ PUBLIC	?StubEntryPoint@@YAXXZ				; StubEntryPoint
 _TEXT	SEGMENT
 ?StubEntryPoint@@YAXXZ PROC				; StubEntryPoint
 
-; 29   :     load_address = (unsigned long long) StubEntryPoint - genv.RVA_to_stub_entry;
+; 34   :     load_address = (unsigned long long) StubEntryPoint - genv.RVA_to_stub_entry_point;
 
   00000	8b 05 00 00 00
 	00		 mov	 eax, DWORD PTR ?genv@@3UGlobalExternVariables@@A
@@ -32,7 +30,30 @@ _TEXT	SEGMENT
   00013	48 89 05 00 00
 	00 00		 mov	 QWORD PTR ?load_address@@3_KA, rax ; load_address
 
-; 30   : } 
+; 35   :     // first the stub needs to locate the compressed data
+; 36   :     // thus, it needs to find the offsets to the sections of
+; 37   :     // the executable it is currently injecting itself into
+; 38   :     //
+; 39   : 
+; 40   :     /*
+; 41   :     // starting from the load address it needs to get to the e_lfanew offset
+; 42   :     unsigned long long * offset = load_address;
+; 43   :     offset += 0x3C;
+; 44   : 
+; 45   :     // now thw offset needs to jump to the address written here
+; 46   :     offset += *offset;
+; 47   : 
+; 48   :     // finally, in order to get to the packed data, it needs to find the sections
+; 49   :     // in order to manage that, i find the size of optional header and jump over it
+; 50   :     offset += 0x14; // current offset = size of optional header
+; 51   :     offset += *offset + 0x2; // current offset = section headers
+; 52   : 
+; 53   :     // the stub reached the start of the compressed data
+; 54   :     // i need the size of the sections
+; 55   :     //
+; 56   :     */
+; 57   : 
+; 58   : }
 
   0001a	c3		 ret	 0
 ?StubEntryPoint@@YAXXZ ENDP				; StubEntryPoint

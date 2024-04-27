@@ -1,7 +1,7 @@
 CC = cl
 LINK = link
 
-COMPRESSOR = ..\extern\zlib\include 
+COMPRESSOR = ..\extern\lz4\lib
 LISTING_FILES = saved_listing_file
 MAP_FILE = map_file
 

@@ -1,17 +1,17 @@
  stub
 
- Timestamp is 6618351a (Thu Apr 11 22:08:10 2024)
+ Timestamp is 662ccd3b (Sat Apr 27 13:02:35 2024)
 
  Preferred load address is 0000000180000000
 
  Start         Length     Name                   Class
  0001:00000000 0000001bH .text$mn                CODE
  0002:00000000 00000010H .A$A                    DATA
- 0002:00000010 00000010H .bss                    DATA
- 0002:00000020 0000001cH .rdata                  DATA
- 0002:0000003c 00000000H .edata                  DATA
- 0002:0000003c 00000020H .rdata$voltmd           DATA
- 0002:0000005c 00000078H .rdata$zzzdbg           DATA
+ 0002:00000010 00000008H .bss                    DATA
+ 0002:00000018 0000001cH .rdata                  DATA
+ 0002:00000034 00000000H .edata                  DATA
+ 0002:00000034 00000020H .rdata$voltmd           DATA
+ 0002:00000054 00000078H .rdata$zzzdbg           DATA
 
   Address         Publics by Value              Rva+Base               Lib:Object
 
@@ -47,8 +47,7 @@
  0001:00000000       ?StubEntryPoint@@YAXXZ     0000000180001000 f   stub.obj
  0002:00000000       ?genv@@3UGlobalExternVariables@@A 0000000180002000     stub.obj
  0002:00000010       ?load_address@@3_KA        0000000180002010     stub.obj
- 0002:00000018       ?original_data_directory@@3U_IMAGE_DATA_DIRECTORY@@A 0000000180002018     stub.obj
- 0002:0000003c       __volatile_metadata        000000018000203c     <linker-defined>
+ 0002:00000034       __volatile_metadata        0000000180002034     <linker-defined>
 
  entry point at        0001:00000000
 
