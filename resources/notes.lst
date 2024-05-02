@@ -1,0 +1,32 @@
+Yes, with this method, you can execute the original entry point of the DLL in the context of the newly created process. After injecting the DLL binary into the new process and creating a remote thread to execute it, the entry point of the DLL will be invoked, just as it would when the DLL is loaded normally by the operating system loader.
+
+However, note that the entry point will be executed in the context of the newly created process, not in the context of the original process where your packer is running. If you need to perform any initialization or setup before executing the entry point of the DLL, you can do so in your packer code before injecting the DLL and creating the remote thread.
+
+In summary, yes, you can pass the execution to the original entry point of the DLL using this method within the context of a packer.
+
+
+To achieve this, you can follow these general steps:
+
+Embed the Decompression DLL in Your Exe: Include the decompression DLL as a resource in your executable.
+Load and Execute the Decompression DLL: At runtime, load the decompression DLL from the embedded resource and execute it within your executable's process. This DLL should handle the decompression of the input data.
+Prepare the Decompressed Data: After the decompression DLL has finished decompressing the input data, ensure that the decompressed data is properly prepared for execution. This may involve tasks such as fixing relocations, setting up thread local storage (TLS), etc.
+Locate the Entry Point of the Decompressed Data: Determine the entry point of the decompressed data. This may require parsing the PE header of the decompressed data or using some other method to locate the entry point address.
+Execute the Entry Point of the Decompressed Data: Once you have the entry point address of the decompressed data, transfer control to it by either calling it directly or creating a new thread to execute it.
+Clean Up Resources: After the decompressed data has finished executing, ensure that you properly clean up any resources used during the execution process.
+
+
+
+
+Yes, you can execute the entry point of the stub DLL by injecting the DLL binary into a new process and creating a remote thread to execute it. This approach mimics the behavior of the operating system loader when loading a DLL normally.
+
+Here's a summary of the steps involved:
+
+1. **Inject the DLL Binary**: Load the stub DLL binary into the memory space of the target process. This can be achieved using various injection techniques, such as `CreateRemoteThread` or `WriteProcessMemory`.
+
+2. **Create a Remote Thread**: After injecting the DLL binary, create a remote thread in the target process and specify the entry point of the DLL as the start address of the thread. This will cause the operating system to begin executing code at the entry point of the DLL within the context of the target process.
+
+3. **Execute the Entry Point**: Once the remote thread starts executing, the entry point of the stub DLL will be invoked. This entry point function can perform any initialization or setup tasks required by the stub, such as decompression, preparation of the payload, etc.
+
+4. **Pass Execution to the Payload**: After the stub DLL has completed its initialization tasks, it can then pass execution to the entry point of the payload (the decompressed data). This can be achieved by calling the entry point function of the payload directly from within the stub DLL, or by any other mechanism suitable for your specific requirements.
+
+By following these steps, you can effectively execute the entry point of the stub DLL within the context of a target process, and subsequently pass execution to the entry point of the payload.

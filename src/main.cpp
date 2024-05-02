@@ -2,8 +2,10 @@
 #include <stdexcept>
 #include <iostream>
 #include <cstdio>
+// cli parser external library
 #include <cxxopts.hpp>
-#include "parser.h"
+// project based imports
+#include "packer.h"
 
 using namespace std;
 
@@ -102,7 +104,9 @@ int main(int argc, char ** argv) {
 
             printf("[+] Outputfile created successfully\n");
         }
-
+    
+        // packer call
+        /*
         HANDLE executableFile = CreateFileA(inputFile, GENERIC_READ | GENERIC_WRITE, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
         if(executableFile == INVALID_HANDLE_VALUE) {
 
@@ -134,7 +138,7 @@ int main(int argc, char ** argv) {
             }
             return EXIT_FAILURE;
         }
-
+    */
     } catch (const exception& e) {
         printf("[-] Error: there was an exception registered during computation: %s\n", e.what());
 
@@ -148,6 +152,5 @@ int main(int argc, char ** argv) {
         }
         return EXIT_FAILURE;
     }
-
     return EXIT_SUCCESS;
 }
