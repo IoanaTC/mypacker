@@ -1,5 +1,5 @@
-./resources/notes.*
-./utils/boilerplate/experiments
+resources\notes.*
+utils\boilerplate\experiments
 
 *.un~
 
