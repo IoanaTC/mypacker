@@ -7,9 +7,10 @@ EXTERN_DIRS = extern/brieflz/include extern/cxxopts/include
 
 SOURCE_DIR = src
 PACKER_DIR = packer
+COMPRESSOR_DIR = utils/compressor
 UTILS_DIR_PE = utils/pe
 
-OBJ_CLEAN = main.o parser.o packer.o
+OBJ_CLEAN = main.o parser.o packer.o compressor.o
 OBJ = main.o packer.o
 
 enigma : $(OBJ)
@@ -19,11 +20,15 @@ enigma : $(OBJ)
 
 main.o : 
 		@echo "Compiling main.cpp..."
-		$(CC) $(CFLAGS) $(EFLAGS) -I$(PACKER_DIR) $(SOURCE_DIR)/main.cpp -o main.o
+		$(CC) $(CFLAGS) $(EFLAGS) -I$(PACKER_DIR) -I$(COMPRESSOR_DIR) $(SOURCE_DIR)/main.cpp -o main.o
 
-packer.o : parser.o
+packer.o : parser.o compressor.o
 		@echo "Compiling the packer..."
-		$(CC) $(CFLAGS) $(EFLAGS) $(PACKER_DIR)/packer.cpp -o packer.o
+		$(CC) $(CFLAGS) $(EFLAGS) -I$(COMPRESSOR_DIR) $(PACKER_DIR)/packer.cpp -o packer.o
+
+compressor.o :
+		@echo "Compiling the compressor..."
+		$(CC) $(CFLAGS) $(EFLAGS) $(COMPRESSOR_DIR)/compressor.cpp -o compressor.o
 
 parser.o : 
 		@echo "Compiling the parser..."

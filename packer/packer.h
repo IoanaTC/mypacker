@@ -1,5 +1,5 @@
 #pragma once
-#include "brieflz.h"
+#include "compressor.h"
 
 #define DELETE_DATA(x) do { if (x) { free(x); x = NULL; } } while(0)
 
@@ -10,7 +10,6 @@ class PACKER {
         ~PACKER();
 
         bool packfile();
-        bool get_header_information;
     private:
         HANDLE hFile;
         unsigned int hFileSize;

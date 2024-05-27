@@ -19,6 +19,8 @@ PACKER::~PACKER() {
    printf("[+] PACKER: destructor has been called\n"); 
 }
 bool PACKER::packfile() {
+    printf("[+] Hello\n");
+    // initialize the chosen compressor, use the wrapper
     return true;
     // initialize compressor
     // parse PE
