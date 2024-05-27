@@ -18,7 +18,6 @@ class COMPRESSOR {
         static constexpr COMPRESSION_METHODS methods[1] = { compress_with_brieflz };
 };
 
-
 typedef class _COMPRESSOR_EXCEPTION : public std::exception 
 {
     private:

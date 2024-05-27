@@ -1,5 +1,5 @@
 CC = g++
-CFLAGS = -m64 -g -std=c++11 -pthread -c -Wall -Werror
+CFLAGS = -m64 -g -std=c++17 -pthread -c -Wall -Werror
 LDFLAGS = 
 
 EFLAGS = $(foreach dir,$(EXTERN_DIRS),-I$(dir))
@@ -11,7 +11,7 @@ COMPRESSOR_DIR = utils/compressor
 UTILS_DIR_PE = utils/pe
 
 OBJ_CLEAN = main.o parser.o packer.o compressor.o
-OBJ = main.o packer.o
+OBJ = main.o packer.o compressor.o
 
 enigma : $(OBJ)
 		@echo "Building final executable file..."

@@ -1,5 +1,4 @@
 #pragma once
-#include "compressor.h"
 
 #define DELETE_DATA(x) do { if (x) { free(x); x = NULL; } } while(0)
 

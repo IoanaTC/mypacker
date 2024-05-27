@@ -1,6 +1,7 @@
 #include <iostream>
 #include <windows.h>
 #include "packer.h"
+#include "compressor.h"
 using namespace std;
 
 PACKER::PACKER() {
@@ -21,6 +22,11 @@ PACKER::~PACKER() {
 bool PACKER::packfile() {
     printf("[+] Hello\n");
     // initialize the chosen compressor, use the wrapper
+    COMPRESSOR* compressor = new COMPRESSOR(0);
+    if(!compressor->call_method(hFile, hFileSize)) {
+        throw PACKER_EXCEPTION("[!] Error: Compression method could not be called properly\n");
+        return false;
+    }
     return true;
     // initialize compressor
     // parse PE
