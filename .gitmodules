@@ -1,12 +1,6 @@
 [submodule "extern/cxxopts"]
 	path = extern/cxxopts
 	url = https://github.com/jarro2783/cxxopts
-[submodule "extern/zlib"]
-	path = extern/zlib
-	url = https://github.com/madler/zlib.git
-[submodule "extern/miniz"]
-	path = extern/miniz
-	url = https://github.com/richgel999/miniz.git
-[submodule "extern/lz4"]
-	path = extern/lz4
-	url = https://github.com/lz4/lz4.git
+[submodule "extern/TinyPE-on-Win10"]
+	path = extern/TinyPE-on-Win10
+	url = https://github.com/ayaka14732/TinyPE-on-Win10.git
