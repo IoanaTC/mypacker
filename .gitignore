@@ -1,6 +1,8 @@
 resources/*.kra*
 utils/boilerplate/experiments
 samples
+packer/rm
+packer/stub
 
 *.un~
 
