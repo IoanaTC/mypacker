@@ -12,6 +12,11 @@ class PACKER {
     private:
         HANDLE hFile;
         unsigned int hFileSize;
+
+        struct _PACKED {
+            char* out;
+            long unsigned int size;
+        };
 };
 
 typedef class _PACKER_EXCEPTION : public std::exception 

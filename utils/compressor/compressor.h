@@ -4,18 +4,26 @@
 #define NUMBER_OF_COMPRESSORS 1
 #define BRIEFL_COMPRESSION_LEVEL 10
 
+#define DELETE_DATA(x) do { if (x) { free(x); x = NULL; } } while(0)
+
+typedef struct _COMPRESSED {
+    char* content;
+    long unsigned int size;
+} COMPRESSED;
+
+
 class COMPRESSOR {
     public:
         COMPRESSOR();
         COMPRESSOR(unsigned int type);
         ~COMPRESSOR();
 
-        long unsigned int call_method(char* in, unsigned int hFileSize, char* out) const; 
+         COMPRESSED* call_method(char* in, unsigned int hFileSize) const; 
     private:
-        static long unsigned int const compress_with_brieflz(char* in, unsigned int hFileSize, char* out);
+        static COMPRESSED* const compress_with_brieflz(char* in, unsigned int hFileSize);
 
         unsigned int type;
-        using COMPRESSION_METHODS = const long unsigned int (*)(char*, unsigned int, char*);
+        using COMPRESSION_METHODS = COMPRESSED* const (*)(char*, unsigned int);
         static constexpr COMPRESSION_METHODS methods[1] = { compress_with_brieflz };
 };
 

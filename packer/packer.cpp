@@ -24,22 +24,43 @@ bool PACKER::packfile() {
     // initialize the chosen compressor, use the wrapper
     char * in = (char*) malloc(hFileSize * sizeof(char));
     if(!in) {
+        printf("[!] Error: PACKER: Could not allocate input buffer\n");
         return false;
     }
     long unsigned int bytesRead = 0;
-    if(!ReadFile(hFile, in, hFileSize, &bytesRead, NULL)) {
+    if(!ReadFile(hFile, in, hFileSize, &bytesRead, NULL) || bytesRead != hFileSize) {
+        printf("[!] Error: PACKER: Could not read input file content properly\n");
+
+        DELETE_DATA(in);
         return false;
     }
-
-    printf("%c\n", *(in + 1));
-
+    // initialize compressor, type = 0 ( could be variable in the future )
     COMPRESSOR compressor(0);
-    char* out = NULL;
-    long unsigned int compressed_size = compressor.call_method(in, hFileSize, out);
-    printf("compressed size = %ld\n", compressed_size);
-    printf("original size = %d\n", hFileSize);
-    if(!compressed_size) {
-        throw PACKER_EXCEPTION("[!] Error: Compression method could not be called properly\n");
+    COMPRESSED* out = NULL;
+    try {
+        out = compressor.call_method(in, hFileSize);
+        if(!out->size) {
+            throw PACKER_EXCEPTION("[!] Error: Compression method could not be called properly\n");
+            DELETE_DATA(in);
+            DELETE_DATA(out);
+            return false;
+        }
+        // debugging
+        /* 
+        HANDLE hDump = CreateFile("dump", GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+        long unsigned int bytes = 0;
+        WriteFile(hDump, out->content, out->size, &bytes, NULL);
+        */
+        printf("compressed size = %ld\n", out->size);
+        printf("original size = %d\n", hFileSize);
+
+        // get boilerplate PE and insert the compressed data into the data section
+
+    } catch(const COMPRESSOR_EXCEPTION &e) {
+        printf("[!] Error: PACKED: An exception has occurred durng file compression: \n%s\n", e.what());
+        DELETE_DATA(in);
+        DELETE_DATA(out);
+
         return false;
     }
     return true;
