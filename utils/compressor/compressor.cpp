@@ -25,8 +25,8 @@ long unsigned int const COMPRESSOR::compress_with_brieflz(char* in, unsigned int
     //
     // get bound on compressed data size
     long unsigned int max_packed_size = blz_max_packed_size(hFileSize);
-    printf("%d\n", max_packed_size);
-    if(!max_packed_size || max_packed_size > hFileSize) {
+    printf("%ld\n", max_packed_size);
+    if(!max_packed_size) {
         throw COMPRESSOR_EXCEPTION("[!] Error: brieflz: Maximum packed size is invalid\n");
     }
     out = (char*) malloc(max_packed_size * sizeof(char));
@@ -35,7 +35,7 @@ long unsigned int const COMPRESSOR::compress_with_brieflz(char* in, unsigned int
     }
     //get required size for temporary buffer 'workmem'
     long unsigned int workmem_size_level = blz_workmem_size_level(hFileSize, BRIEFL_COMPRESSION_LEVEL);
-    if(!workmem_size_level || workmem_size_level > hFileSize) {
+    if(!workmem_size_level) {
         throw COMPRESSOR_EXCEPTION("[!] Error: brieflz: Workmem size buffer is invalid\n");
     }
     char* workmem = (char*) malloc(workmem_size_level * sizeof(char));
