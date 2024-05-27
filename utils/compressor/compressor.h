@@ -2,6 +2,7 @@
 #include "brieflz.h"
 
 #define NUMBER_OF_COMPRESSORS 1
+#define BRIEFL_COMPRESSION_LEVEL 10
 
 class COMPRESSOR {
     public:
@@ -9,12 +10,12 @@ class COMPRESSOR {
         COMPRESSOR(unsigned int type);
         ~COMPRESSOR();
 
-        bool call_method(HANDLE hFile, unsigned int hFileSize) const; 
+        long unsigned int call_method(char* in, unsigned int hFileSize, char* out) const; 
     private:
-        static bool const compress_with_brieflz(HANDLE hFile, unsigned int hFileSize);
+        static long unsigned int const compress_with_brieflz(char* in, unsigned int hFileSize, char* out);
 
         unsigned int type;
-        using COMPRESSION_METHODS = const bool (*)(HANDLE, unsigned int);
+        using COMPRESSION_METHODS = const long unsigned int (*)(char*, unsigned int, char*);
         static constexpr COMPRESSION_METHODS methods[1] = { compress_with_brieflz };
 };
 

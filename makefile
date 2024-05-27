@@ -4,6 +4,7 @@ LDFLAGS =
 
 EFLAGS = $(foreach dir,$(EXTERN_DIRS),-I$(dir))
 EXTERN_DIRS = extern/brieflz/include extern/cxxopts/include
+BRIEFL_LIB = extern/brieflz/build/Release/brieflz.lib
 
 SOURCE_DIR = src
 PACKER_DIR = packer
@@ -15,7 +16,7 @@ OBJ = main.o packer.o compressor.o
 
 enigma : $(OBJ)
 		@echo "Building final executable file..."
-		$(CC) $(LDFLAGS) $(OBJ) -o enigma
+		$(CC) $(LDFLAGS) $(OBJ) $(BRIEFL_LIB) -o enigma
 		rm -rf $(OBJ_CLEAN)
 
 main.o : 

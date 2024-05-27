@@ -22,8 +22,23 @@ PACKER::~PACKER() {
 bool PACKER::packfile() {
     printf("[+] Hello\n");
     // initialize the chosen compressor, use the wrapper
-    COMPRESSOR* compressor = new COMPRESSOR(0);
-    if(!compressor->call_method(hFile, hFileSize)) {
+    char * in = (char*) malloc(hFileSize * sizeof(char));
+    if(!in) {
+        return false;
+    }
+    long unsigned int bytesRead = 0;
+    if(!ReadFile(hFile, in, hFileSize, &bytesRead, NULL)) {
+        return false;
+    }
+
+    printf("%c\n", *(in + 1));
+
+    COMPRESSOR compressor(0);
+    char* out = NULL;
+    long unsigned int compressed_size = compressor.call_method(in, hFileSize, out);
+    printf("compressed size = %ld\n", compressed_size);
+    printf("original size = %d\n", hFileSize);
+    if(!compressed_size) {
         throw PACKER_EXCEPTION("[!] Error: Compression method could not be called properly\n");
         return false;
     }
