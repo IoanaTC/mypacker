@@ -4,3 +4,6 @@
 [submodule "extern/TinyPE-on-Win10"]
 	path = extern/TinyPE-on-Win10
 	url = https://github.com/ayaka14732/TinyPE-on-Win10.git
+[submodule "extern/brieflz"]
+	path = extern/brieflz
+	url = https://github.com/jibsen/brieflz.git
