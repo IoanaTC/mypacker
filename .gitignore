@@ -1,5 +1,5 @@
-resources\notes.*
-utils\boilerplate\experiments
+resources/*.kra*
+utils/boilerplate/experiments
 
 *.un~
 
