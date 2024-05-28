@@ -90,7 +90,7 @@ opthdr:
     dq 0x100000     ; SizeOfHeapReserve
     dq 0x10000      ; SizeOfHeapCommit UNUSED
     dd 0            ; LoaderFlags UNUSED
-    dd 16            ; NumberOfRvaAndSizes UNUSED -> number of data directories (there are 16 of them)
+    dd 0            ; NumberOfRvaAndSizes UNUSED -> number of data directories (there are 16 of them)
 ;
 ; Data Directories
 ;
