@@ -23,7 +23,7 @@ pesig:
 ;
 IMAGE_FILE_MACHINE_AMD64 equ 0x8664
 ;
-csections equ 3
+csections equ 1
 ;
 IMAGE_FILE_32BIT_MACHINE equ 0x0100
 RESERVED_FLAG equ 0x0040
@@ -37,9 +37,9 @@ characteristics equ IMAGE_FILE_DEBUG_STRIPPED | IMAGE_FILE_LARGE_ADDRESS_AWARE |
 pehdr:
     dw IMAGE_FILE_MACHINE_AMD64
     dw csections      ; NumberofSections
-    dd 0x3CF2F4A0     ; TimeDateStamp UNUSED 
-    dd 0              ; PointerTOSymbolTable UNUSED
-    dd 0              ; NumberOfSymbols UNUSED
+    dd 0x3CF2F4A0     ; TimeDateStamp UNUSED            -> use as compressed data offset placeholder 
+    dd 0              ; PointerTOSymbolTable UNUSED     -> compressed data size
+    dd 0              ; NumberOfSymbols UNUSED          
     dw opthdrsize     ; SizeOfOptionalHeader (either 32b -> 31 fileds, or 64b -> 30 fields)
     dw characteristics; Characteristics filed of the file header
 ;
@@ -95,47 +95,21 @@ opthdr:
 ; Data Directories
 ;
     times 16 dd 0, 0
-opthdrsize equ $ - opthdr
 ;
-; Section Header
+opthdrsize equ $ - opthdr
 ;
 ; PE code section
 ;
-text:
     db ".text", 0, 0, 0
     dd codesize    ; VirtualSize
     dd round(hdrsize, sectionalign) ; VirtualAddress
     dd round(codesize, filealign); SizeOfRawData
-    dd code                      ; PointerToRelocations UNSUED
-    dd 0                         ; PointerToRawData UNUSED
-    dd 0                         ; PointerToLineNmbers UNUSED (for debugging)
-    dw 0                         ; NumberOfRelocations UNUSED
-    dw 0                         ; NumberOfLineNumbers UNUSED
-    dd 0x60000020                ; Characteristics UNUSED (code, execute, read)
-;
-data:
-    db ".comp", 0, 0, 0        ; Section Name
-    dd 0 ; VirtualSize
-    dd round(hdrsize, sectionalign) + round(codesize, filealign) ; VirtualAddress
-    dd 0 ;SizeOfRawData
-    dd round(hdrsize, sectionalign) + round(codesize, filealign)  ; PointerToRawData
-    dd 0                       ; PointerToRelocations
-    dd 0                       ; PointerToLinenumbers
-    dw 0                       ; NumberOfRelocations
-    dw 0                       ; NumberOfLinenumbers
-    dd 0xC0000040              ; Characteristics (initialized data, read, write)
-;
-rsrc:
-    db ".stub", 0, 0, 0        ; Section Name
-    dd 0                       ; VirtualSize
-    dd round(hdrsize, sectionalign) + round(codesize, filealign) ; VirtualAddress
-    dd 0                       ; SizeOfRawData
-    dd 0                       ; PointerToRawData
-    dd 0                       ; PointerToRelocations
-    dd 0                       ; PointerToLinenumbers
-    dw 0                       ; NumberOfRelocations
-    dw 0                       ; NumberOfLinenumbers
-    dd 0x40000040              ; Characteristics (initialized data, read)
+    dd code            ; PointerToRelocations UNSUED
+    dd 0
+    dd 0            ; PointerToLineNmbers UNUSED (for debugging)
+    dw 0            ; NumberOfRelocations UNUSED
+    dw 0            ; NumberOfLineNumbers UNUSED
+    dd 0x60000020   ; Characteristics UNUSED (code, execute, read)
 ;
 hdrsize equ $ - $$
 ;

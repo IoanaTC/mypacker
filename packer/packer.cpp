@@ -75,18 +75,13 @@ bool PACKER::packfile() {
             throw PACKER_EXCEPTION("[!] Error: PACKER: improper use of boilerplate\n");
         }
         // insert needed offsets
-        *(DWORD *) (boilerplate + DATA_DIRECTORY_OFFSET_TINY_PE) = bsize;
-        *(DWORD *) (boilerplate + DATA_DIRECTORY_OFFSET_TINY_PE + sizeof(DWORD)) = out->size;
-        *(DWORD *) (boilerplate + DATA_DIRECTORY_OFFSET_TINY_PE + COMPRESSED_DATA_DIRECTORY) = bsize + STUB_SIZE;
-        *(DWORD *) (boilerplate + DATA_DIRECTORY_OFFSET_TINY_PE + COMPRESSED_DATA_DIRECTORY + sizeof(DWORD)) = STUB_SIZE;
-
         *(DWORD *) (boilerplate + OFFSET_OF_DATA_VIRTSIZE) = out->size;
         *(DWORD *) (boilerplate + OFFSET_OF_DATA_VIRTSIZE + 2*sizeof(DWORD)) = out->size;
 
-        *(DWORD *) (boilerplate + OFFSET_OF_RSRC_VIRTSIZE) = bsize + out->size;
-        *(DWORD *) (boilerplate + OFFSET_OF_RSRC_VIRTSIZE + sizeof(DWORD)) = STUB_SIZE;
-        *(DWORD *) (boilerplate + OFFSET_OF_RSRC_VIRTSIZE + 2*sizeof(DWORD)) = bsize + out->size;
-        *(DWORD *) (boilerplate + OFFSET_OF_RSRC_VIRTSIZE + 3*sizeof(DWORD)) = STUB_SIZE;
+        *(DWORD *) (boilerplate + OFFSET_OF_RSRC_VIRTSIZE) = STUB_SIZE;
+        *(DWORD *) (boilerplate + OFFSET_OF_RSRC_VIRTSIZE + sizeof(DWORD)) = bsize + out->size;
+        *(DWORD *) (boilerplate + OFFSET_OF_RSRC_VIRTSIZE + 2*sizeof(DWORD)) = STUB_SIZE;
+        *(DWORD *) (boilerplate + OFFSET_OF_RSRC_VIRTSIZE + 3*sizeof(DWORD)) = bsize + out->size;
 
         HANDLE hDump = CreateFile("dump", GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
         if(hDump == INVALID_HANDLE_VALUE) {

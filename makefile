@@ -1,6 +1,6 @@
 CC = g++
 CFLAGS = -m64 -g -std=c++17 -pthread -c -Wall -Werror
-LDFLAGS = 
+LDFLAGS = -static
 
 EFLAGS = $(foreach dir,$(EXTERN_DIRS),-I$(dir))
 EXTERN_DIRS = extern/brieflz/include extern/cxxopts/include

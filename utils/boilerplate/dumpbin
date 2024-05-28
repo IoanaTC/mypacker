@@ -65,6 +65,20 @@ OPTIONAL HEADER VALUES
 
 
 SECTION HEADER #1
+   .text name
+       4 virtual size
+     184 virtual address (0000000000400184 to 0000000000400187)
+       4 size of raw data
+     184 file pointer to raw data (00000184 to 00000187)
+       0 file pointer to relocation table
+       0 file pointer to line numbers
+       0 number of relocations
+       0 number of line numbers
+60000020 flags
+         Code
+         Execute Read
+
+SECTION HEADER #2
    .data name
        0 virtual size
      188 virtual address
@@ -78,7 +92,7 @@ C0000040 flags
          Initialized Data
          Read Write
 
-SECTION HEADER #2
+SECTION HEADER #3
    .rsrc name
        0 virtual size
      188 virtual address
@@ -91,20 +105,6 @@ SECTION HEADER #2
 40000040 flags
          Initialized Data
          Read Only
-
-SECTION HEADER #3
-   .text name
-       4 virtual size
-     15C virtual address (000000000040015C to 000000000040015F)
-       4 size of raw data
-     184 file pointer to raw data (00000184 to 00000187)
-       0 file pointer to relocation table
-       0 file pointer to line numbers
-       0 number of relocations
-       0 number of line numbers
-60000020 flags
-         Code
-         Execute Read
 
   Summary
 
