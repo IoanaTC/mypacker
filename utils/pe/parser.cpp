@@ -1,7 +1,9 @@
-#include "parser.h"
+#include <iostream>
 #include <windows.h>
 #include <cstdio>
 #include <cstdint>
+#include "parser.h"
+using namespace std;
 
 WORD PE_PARSER::getWordLE(const void *pData, int index) {     
     const unsigned char *pdata = static_cast<const unsigned char *>(pData);
@@ -29,6 +31,9 @@ PE_PARSER::PE_PARSER(HANDLE inputFile) {
 
     DOS_STUB = NULL;
     NT_HEADERS = NULL;
+    SECTIONS = NULL;
+
+    content = NULL;
 }
 //
 // parser for DOS HEADER
@@ -187,14 +192,44 @@ BOOL PE_PARSER::parseSectionHeader() {
     }
     DWORD bytesRead = 0;
     for(unsigned int counter = 0; counter < numberofSections; counter++) {
-        if(SetFilePointer(inputFile, counter * sizeofSectionHeader, NULL, FILE_CURRENT)) {
+        if(!SetFilePointer(inputFile, counter * sizeofSectionHeader, NULL, FILE_CURRENT)) {
             throw PARSER_EXCEPTION("[-] Error: Could not set file pointer to beging of current section\n");
         }
         if(!ReadFile(inputFile, &SECTIONS[counter], sizeofSectionHeader, &bytesRead, NULL) || bytesRead != sizeofSectionHeader) {
             throw PARSER_EXCEPTION("[-] Error: Could not read from current file pointer, section header\n");
         }
     }
+    this->sections_offset = FAofSections + numberofSections * sizeofSectionHeader;
     printf("[+] Section Header successfully read.\n");
+    return true;
+}
+BOOL PE_PARSER::getSections() {
+    if(!SECTIONS || !NT_HEADERS) {
+        throw PARSER_EXCEPTION("[-] Error: Headers must be read before getting section data\n");
+    }
+    printf("[+] Getting entire content between headers and overlay...\n");
+    if(!sections_offset) {
+        throw PARSER_EXCEPTION("[-] Error: There is insuficient dta to parse the content\n");
+    }
+    // get ACT offset from DataDirectory.SecurityDirectory
+    unsigned int act_offset = NT_HEADERS64.OptionalHeader.DataDirectory[_IMAGE_DIRECTORY_ENTRY_SECURITY].VirtualAddress; 
+    unsigned int sections_size = act_offset - sections_offset;
+
+    if(sections_size > act_offset) {
+        throw PARSER_EXCEPTION("[-] Error: Overflowed when computed sections_size\n");
+    }
+    content = (char*) malloc(sections_size * sizeof(char));
+    if(!content) {
+        throw PARSER_EXCEPTION("[-] Error: Could not allocate conten buffer\n");
+    }
+    if(!SetFilePointer(inputFile, sections_offset, NULL, FILE_BEGIN)) {
+        throw PARSER_EXCEPTION("[-] Error: Could not set file pointer to begining of sections data\n");
+    }
+    DWORD bytesRead = 0;
+    if(!ReadFile(inputFile, content, sections_size, &bytesRead, NULL) || (bytesRead != sections_size)) {
+        throw PARSER_EXCEPTION("[-] Error: Could not read ssection content from input file\n");
+    } 
+    printf("[+] Sections Content read succesfully\n");
     return true;
 }
 //
@@ -226,5 +261,13 @@ PE_PARSER::~PE_PARSER() {
     if(NT_HEADERS) {
         free(NT_HEADERS);
         NT_HEADERS = NULL;
+    }
+    if(SECTIONS) {
+        free(SECTIONS);
+        SECTIONS = NULL;
+    }
+    if(content) {
+        free(content);
+        content = NULL;
     }
 }

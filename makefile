@@ -12,24 +12,24 @@ COMPRESSOR_DIR = utils/compressor
 UTILS_DIR_PE = utils/pe
 
 OBJ_CLEAN = main.o parser.o packer.o compressor.o
-OBJ = main.o packer.o compressor.o
+OBJ = main.o packer.o compressor.o parser.o
 
 enigma : $(OBJ)
 		@echo "Building final executable file..."
-		$(CC) $(LDFLAGS) $(OBJ) $(BRIEFL_LIB) -o enigma
+		$(CC) $(LDFLAGS) $(OBJ) $(BRIEFL_LIB) -I$(UTILS_DIR_PE) -o enigma
 		rm -rf $(OBJ_CLEAN)
 
-main.o : 
+main.o : packer.o parser.o compressor.o
 		@echo "Compiling main.cpp..."
-		$(CC) $(CFLAGS) $(EFLAGS) -I$(PACKER_DIR) -I$(COMPRESSOR_DIR) $(SOURCE_DIR)/main.cpp -o main.o
+		$(CC) $(CFLAGS) $(EFLAGS) -I$(PACKER_DIR) -I$(COMPRESSOR_DIR) -I$(UTILS_DIR_PE) $(SOURCE_DIR)/main.cpp -o main.o
 
 packer.o : parser.o compressor.o
 		@echo "Compiling the packer..."
-		$(CC) $(CFLAGS) $(EFLAGS) -I$(COMPRESSOR_DIR) $(PACKER_DIR)/packer.cpp -o packer.o
+		$(CC) $(CFLAGS) $(EFLAGS) -I$(COMPRESSOR_DIR) -I$(UTILS_DIR_PE) $(PACKER_DIR)/packer.cpp -o packer.o
 
 compressor.o :
 		@echo "Compiling the compressor..."
-		$(CC) $(CFLAGS) $(EFLAGS) $(COMPRESSOR_DIR)/compressor.cpp -o compressor.o
+		$(CC) $(CFLAGS) $(EFLAGS) -I$(UTILS_DIR_PE) $(COMPRESSOR_DIR)/compressor.cpp -o compressor.o
 
 parser.o : 
 		@echo "Compiling the parser..."

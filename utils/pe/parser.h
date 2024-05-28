@@ -18,6 +18,9 @@ class PE_PARSER
 
         ___PIMAGE_SECTION_HEADER   SECTIONS;  
 
+        char* content;
+        long unsigned int sections_offset;
+
         HANDLE inputFile;
 
     public:
@@ -35,6 +38,8 @@ class PE_PARSER
 
         BOOL parseNTHeaders();
         BOOL parseSectionHeader();
+
+        BOOL getSections();
 };
 
 typedef class _PARSER_EXCEPTION : public std::exception 

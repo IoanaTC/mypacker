@@ -1,6 +1,6 @@
 #pragma once
 
-#define DELETE_DATA(x) do { if (x) { free(x); x = NULL; } } while(0)
+#define BOILERPLATE "utils/boilerplate/boilerplate"
 
 class PACKER {
     public:
@@ -12,11 +12,6 @@ class PACKER {
     private:
         HANDLE hFile;
         unsigned int hFileSize;
-
-        struct _PACKED {
-            char* out;
-            long unsigned int size;
-        };
 };
 
 typedef class _PACKER_EXCEPTION : public std::exception 

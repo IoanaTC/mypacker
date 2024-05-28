@@ -99,25 +99,13 @@ int main(int argc, char ** argv) {
                 delete[] outputFile;
                 outputFile = NULL;
             }
-            return EXIT_FAILURE;
-        }
-        PACKER* packer = new PACKER(hExecutableFile);
-        if(!packer) {
-            printf("[!] Error: Could not create packer instance\n");
-            if(inputFile) {
-                free(inputFile);
-                inputFile = NULL;
-            }
-            if(outputFile) {
-                delete[] outputFile;
-                outputFile = NULL;
-            }
             if(!CloseHandle(hExecutableFile)) {
-                printf("[!] Error: Could not close file handle properly\n");
+                printf("[!] Error: Could not close executbale file handle\n");
             }
             return EXIT_FAILURE;
         }
-        if(!packer->packfile()) {
+        PACKER packer(hExecutableFile);
+        if(!packer.packfile()) {
             printf("[!] Error : Could not create packed file.\n");
             if(inputFile) {
                 free(inputFile);
