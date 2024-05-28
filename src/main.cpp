@@ -122,7 +122,7 @@ int main(int argc, char ** argv) {
         }
         // end of packer call
     } catch (const exception& e) {
-        printf("[-] Error: there was an exception registered during computation: \n%s\n", e.what());
+        printf("[-] Error: there was an exception registered during computation: \n%s", e.what());
         if(inputFile) {
             free(inputFile);
             inputFile = NULL;

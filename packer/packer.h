@@ -1,6 +1,10 @@
 #pragma once
 
 #define BOILERPLATE "utils/boilerplate/boilerplate"
+#define DATA_DIRECTORY_OFFSET_TINY_PE 0x8C
+#define COMPRESSED_DATA_DIRECTORY 0x8
+#define STUB_DATA_DIRECTORY 0x8
+#define STUB_SIZE 0x10
 
 class PACKER {
     public:

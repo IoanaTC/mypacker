@@ -45,6 +45,8 @@ BOOL PE_PARSER::parseDosHeader() {
     if(!ReadFile(inputFile, &DOS_HEADER, sizeof(___IMAGE_DOS_HEADER), &bytesRead, NULL)) {
         throw PARSER_EXCEPTION("[-] Error: Could not read DOS Header.\n");
     }
+    cout<<"error: " << GetLastError()<<"\n";
+    printf("%p %ld\n", inputFile, bytesRead);
     if(bytesRead != sizeof(___IMAGE_DOS_HEADER)) {
         throw PARSER_EXCEPTION("[-] Error: Could not read DOS Header entirely.\n");
     }
@@ -229,7 +231,7 @@ BOOL PE_PARSER::getSections() {
     if(!ReadFile(inputFile, content, sections_size, &bytesRead, NULL) || (bytesRead != sections_size)) {
         throw PARSER_EXCEPTION("[-] Error: Could not read ssection content from input file\n");
     } 
-    printf("[+] Sections Content read succesfully\n");
+    printf("[+] Sections Content succesfully read.\n");
     return true;
 }
 //
