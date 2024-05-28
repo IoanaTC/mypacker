@@ -20,6 +20,7 @@ class PE_PARSER
 
         char* content;
         long unsigned int sections_offset;
+        unsigned int number_of_sections;
 
         HANDLE inputFile;
 

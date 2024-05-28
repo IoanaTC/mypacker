@@ -22,33 +22,57 @@ PACKER::~PACKER() {
 }
 bool PACKER::packfile() {
     printf("[+] Hello\n");
-    // initialize the chosen compressor, use the wrapper
-    char * in = (char*) malloc(hFileSize * sizeof(char));
-    if(!in) {
-        printf("[!] Error: PACKER: Could not allocate input buffer\n");
-        return false;
-    }
     long unsigned int bytesRead = 0;
+    /*
     if(!ReadFile(hFile, in, hFileSize, &bytesRead, NULL) || bytesRead != hFileSize) {
         printf("[!] Error: PACKER: Could not read input file content properly\n");
 
         DELETE_DATA(in);
         return false;
     }
+    */
+    // initialize the chosen compressor, use the wrapper
     // initialize compressor, type = 0 ( could be variable in the future )
     COMPRESSOR compressor(0);
     COMPRESSED* out = NULL;
     try {
-        out = compressor.call_method(in, hFileSize);
+        // TODO: parse PE, get only the necessary information
+        //
+        // initialize a PE_PARSER
+        SetFilePointer(hFile, 0, NULL, FILE_BEGIN);
+        PE_PARSER* p_in = new PE_PARSER(hFile);
+        if(!p_in) {
+            throw PACKER_EXCEPTION("[!] Error: PACKED: Could not initialize instance of input parser\n");
+        }
+        p_in->parseDosHeader(); // DOS_HEADER
+        p_in->parseNTHeaders(); // NT_HEADERS64
+        p_in->parseSectionHeader(); // SECTIONS
+        p_in->getSections(); //content
+        long unsigned int original_size = sizeof(DOS_HEADER) + 
+                                          sizeof(NT_HEADERS64) + 
+                                          p_in->number_of_sections * sizeof(___IMAGE_SECTION_HEADER) +
+                                          strlen(p_in->content);
+
+        char * in = (char*) malloc(original_size * sizeof(char));
+        if(!in) {
+            printf("[!] Error: PACKER: Could not allocate input buffer\n");
+            return false;
+        }
+        
+        out = compressor.call_method(in, original_size);
         if(!out->size) {
             throw PACKER_EXCEPTION("[!] Error: Compression method could not be called properly\n");
         }
         // debugging
+        /* 
+           HANDLE hDump = CreateFile("dump", GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+           long unsigned int bytes = 0;
+           WriteFile(hDump, out->content, out->size, &bytes, NULL);
+           */
         printf("compressed size = %ld\n", out->size);
         printf("original size = %d\n", hFileSize);
         // get boilerplate PE and insert the compressed data into the data section
-        // TODO: parse PE, get only the necessary information
-        //
+                             
         // open boilerplate and read its content
         HANDLE hBoilerplate = CreateFile(BOILERPLATE, GENERIC_READ, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
         if(hBoilerplate == INVALID_HANDLE_VALUE) {
@@ -74,32 +98,14 @@ bool PACKER::packfile() {
         if(bsize < DATA_DIRECTORY_OFFSET_TINY_PE + COMPRESSED_DATA_DIRECTORY + STUB_DATA_DIRECTORY) {
             throw PACKER_EXCEPTION("[!] Error: PACKER: improper use of boilerplate\n");
         }
-        // insert needed offsets
         *(DWORD *) (boilerplate + DATA_DIRECTORY_OFFSET_TINY_PE) = bsize;
         *(DWORD *) (boilerplate + DATA_DIRECTORY_OFFSET_TINY_PE + sizeof(DWORD)) = out->size;
         *(DWORD *) (boilerplate + DATA_DIRECTORY_OFFSET_TINY_PE + COMPRESSED_DATA_DIRECTORY) = bsize + STUB_SIZE;
-        *(DWORD *) (boilerplate + DATA_DIRECTORY_OFFSET_TINY_PE + COMPRESSED_DATA_DIRECTORY + sizeof(DWORD)) = STUB_SIZE;
-
-        *(DWORD *) (boilerplate + OFFSET_OF_DATA_VIRTSIZE) = out->size;
-        *(DWORD *) (boilerplate + OFFSET_OF_DATA_VIRTSIZE + 2*sizeof(DWORD)) = out->size;
-
-        *(DWORD *) (boilerplate + OFFSET_OF_RSRC_VIRTSIZE) = bsize + out->size;
-        *(DWORD *) (boilerplate + OFFSET_OF_RSRC_VIRTSIZE + sizeof(DWORD)) = STUB_SIZE;
-        *(DWORD *) (boilerplate + OFFSET_OF_RSRC_VIRTSIZE + 2*sizeof(DWORD)) = bsize + out->size;
-        *(DWORD *) (boilerplate + OFFSET_OF_RSRC_VIRTSIZE + 3*sizeof(DWORD)) = STUB_SIZE;
+        *(DWORD *) (boilerplate + DATA_DIRECTORY_OFFSET_TINY_PE + COMPRESSED_DATA_DIRECTORY + sizeof(DWORD)) = STUB_SIZE; 
 
         HANDLE hDump = CreateFile("dump", GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
-        if(hDump == INVALID_HANDLE_VALUE) {
-            throw PACKER_EXCEPTION("[!] Error: PACKED: Could not create packed file dump handle\n");
-        }
         long unsigned int bytes = 0;
-        if(!WriteFile(hDump, boilerplate, bsize, &bytes, NULL)) {
-            throw PACKER_EXCEPTION("[!] Error: PACKED: Could not dump adjusted tinyPE\n");
-        }
-        if(!WriteFile(hDump, out->content, out->size, &bytes, NULL)) {
-            throw PACKER_EXCEPTION("[!] Error: PACKED: Could not append the compressed data to the end of tinyPE\n");
-        }
-        // append decompressing stub
+        WriteFile(hDump, boilerplate, bsize, &bytes, NULL);
 
     } catch(const PACKER_EXCEPTION &e) {
         printf("[!] Error: PACKED: An exception has occurred durng file compression: \n%s", e.what());

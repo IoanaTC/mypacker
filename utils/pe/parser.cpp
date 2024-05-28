@@ -168,16 +168,18 @@ BOOL PE_PARSER::parseSectionHeader() {
     if(!NT_HEADERS || !DOS_HEADER.e_lfanew){
         throw PARSER_EXCEPTION("[-] Error: Could not find needed headers of PE\n");
     }
-    WORD numberofSections = getWordLE(&((___PIMAGE_NT_HEADERS32) NT_HEADERS)->FileHeader.NumberOfSections, 0);
+    WORD numberofSections = getWordLE(&((___PIMAGE_NT_HEADERS64) NT_HEADERS)->FileHeader.NumberOfSections, 0);
+    number_of_sections = numberofSections;
+
     if(!numberofSections){
         throw PARSER_EXCEPTION("[-] Error: No sections were registered\n");
     }
     //
     // set file poniter to begining of section header
     //
-    size_t FAofSections = DOS_HEADER.e_lfanew + sizeof(((___PIMAGE_NT_HEADERS32) NT_HEADERS)->Signature) + 
-                                                sizeof(((___PIMAGE_NT_HEADERS32) NT_HEADERS)->FileHeader) + 
-                                                ((___PIMAGE_NT_HEADERS32) NT_HEADERS)->FileHeader.SizeOfOptionalHeader;
+    size_t FAofSections = DOS_HEADER.e_lfanew + sizeof(((___PIMAGE_NT_HEADERS64) NT_HEADERS)->Signature) + 
+                                                sizeof(((___PIMAGE_NT_HEADERS64) NT_HEADERS)->FileHeader) + 
+                                                ((___PIMAGE_NT_HEADERS64) NT_HEADERS)->FileHeader.SizeOfOptionalHeader;
     if(!FAofSections){
         throw PARSER_EXCEPTION("[-] Error: Could not compute section header file offset\n");
     }
@@ -220,7 +222,7 @@ BOOL PE_PARSER::getSections() {
     if(sections_size > act_offset) {
         throw PARSER_EXCEPTION("[-] Error: Overflowed when computed sections_size\n");
     }
-    content = (char*) malloc(sections_size * sizeof(char));
+    content = (char*) malloc((sections_size + 1) * sizeof(char));
     if(!content) {
         throw PARSER_EXCEPTION("[-] Error: Could not allocate conten buffer\n");
     }
@@ -230,7 +232,8 @@ BOOL PE_PARSER::getSections() {
     DWORD bytesRead = 0;
     if(!ReadFile(inputFile, content, sections_size, &bytesRead, NULL) || (bytesRead != sections_size)) {
         throw PARSER_EXCEPTION("[-] Error: Could not read ssection content from input file\n");
-    } 
+    }
+    content[sections_size] = 0;
     printf("[+] Sections Content succesfully read.\n");
     return true;
 }
