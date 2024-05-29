@@ -145,9 +145,8 @@ align filealign, db 0
 ;
 code:
 entry_point:
-    push byte 42
-    pop rax
-    ret
+    // the packer needs to get the base address of the process
+    // to do that i will
 ;
 codesize equ $ - code
 filesize equ $ - $$

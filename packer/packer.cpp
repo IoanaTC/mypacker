@@ -22,24 +22,28 @@ PACKER::~PACKER() {
 }
 bool PACKER::packfile() {
     printf("[+] Hello\n");
+    HANDLE hMapping = CreateFileMapping(hFile, 0, PAGE_READWRITE, 0, 0, NULL);
+    if(!hMapping) {
+        cout<<GetLastError()<<endl;
+        printf("[!] Error: PACKED: Cannot create file mapping from given input\n");
+        return false;
+    }
+    printf("a ajuns aici %p\n", hMapping);
+    char* mappedImage = (char*) MapViewOfFile(hMapping, FILE_MAP_READ, 0, 0, 0);
+    if(!mappedImage) {
+        printf("[!] Error: PACKED: Cannot get map view of input file\n");
+        return false;
+    }
+    if(!CloseHandle(hMapping)) {
+        printf("[!] Error: Cannot close hMapping handle\n");
+        return false;
+    }
     // initialize the chosen compressor, use the wrapper
-    char * in = (char*) malloc(hFileSize * sizeof(char));
-    if(!in) {
-        printf("[!] Error: PACKER: Could not allocate input buffer\n");
-        return false;
-    }
-    long unsigned int bytesRead = 0;
-    if(!ReadFile(hFile, in, hFileSize, &bytesRead, NULL) || bytesRead != hFileSize) {
-        printf("[!] Error: PACKER: Could not read input file content properly\n");
-
-        DELETE_DATA(in);
-        return false;
-    }
     // initialize compressor, type = 0 ( could be variable in the future )
     COMPRESSOR compressor(0);
     COMPRESSED* out = NULL;
     try {
-        out = compressor.call_method(in, hFileSize);
+        out = compressor.call_method(mappedImage, hFileSize);
         if(!out->size) {
             throw PACKER_EXCEPTION("[!] Error: Compression method could not be called properly\n");
         }
@@ -49,46 +53,35 @@ bool PACKER::packfile() {
         // get boilerplate PE and insert the compressed data into the data section
         // TODO: parse PE, get only the necessary information
         //
-        // open boilerplate and read its content
-        HANDLE hBoilerplate = CreateFile(BOILERPLATE, GENERIC_READ, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
-        if(hBoilerplate == INVALID_HANDLE_VALUE) {
-            throw PACKER_EXCEPTION("[!] Error: PACKED: Could not access boilerplate PE\n");
+        // get this PE form from this exes own resource section
+        HMODULE hModule = GetModuleHandle(NULL);
+        if(!hModule) {
+            throw PACKER_EXCEPTION("[!] Error: PACKED: Could not get this process current loaded module\n");
         }
-        unsigned int bsize = GetFileSize(hBoilerplate, NULL);
-        printf("%016X\n", bsize);
-        if(bsize == INVALID_FILE_SIZE) {
-            throw PACKER_EXCEPTION("[!] Error: PACKED: Could not get boilerplate filesize\n");
+        long unsigned int resource_size = 0;
+        HRSRC hResource = FindResource(hModule, MAKEINTRESOURCE(IDR_RES), RT_RCDATA);
+        if(!hResource)  {
+            throw PACKER_EXCEPTION("[!] Error: PACKED: Could not get current module's requested resource\n");
         }
-        char * boilerplate = (char*) malloc(bsize * sizeof(char));
-        if(!boilerplate) {
-            throw PACKER_EXCEPTION("[!] Error: PACKED: Could not get boilerplate data\n");
+        HGLOBAL hResData = LoadResource(hModule, hResource);
+        if(!hResData) {
+            throw PACKER_EXCEPTION("[!] Error: PACKED: Could not load requested resource\n");
         }
-        SetFilePointer(hFile, 0, NULL, FILE_BEGIN);
-        bytesRead = 0;
-        if(!ReadFile(hBoilerplate, boilerplate, bsize, &bytesRead, NULL) || bytesRead != bsize) {
-            throw PACKER_EXCEPTION("[!] Error: PACKED: Could not read boilerplate info\n");
+        resource_size = SizeofResource(hModule, hResource);
+        if(!resource_size) {
+            throw PACKER_EXCEPTION("[!] Error: PACKED: Could not get resource size\n");
         }
-        // adjust boilerplate to the input file and dump the result
-        // change headers 
-        //
-        if(bsize < DATA_DIRECTORY_OFFSET_TINY_PE + COMPRESSED_DATA_DIRECTORY + STUB_DATA_DIRECTORY) {
-            throw PACKER_EXCEPTION("[!] Error: PACKER: improper use of boilerplate\n");
+        unsigned char* resource_data = (unsigned char *) LockResource(hResData);
+        if(!resource_data) {
+            throw PACKER_EXCEPTION("[!] Error: PACKED: Could not get resource data\n");
         }
-        // insert needed offsets
-        *(DWORD *) (boilerplate + OFFSET_OF_DATA_VIRTSIZE) = out->size;
-        *(DWORD *) (boilerplate + OFFSET_OF_DATA_VIRTSIZE + 2*sizeof(DWORD)) = out->size;
 
-        *(DWORD *) (boilerplate + OFFSET_OF_RSRC_VIRTSIZE) = STUB_SIZE;
-        *(DWORD *) (boilerplate + OFFSET_OF_RSRC_VIRTSIZE + sizeof(DWORD)) = bsize + out->size;
-        *(DWORD *) (boilerplate + OFFSET_OF_RSRC_VIRTSIZE + 2*sizeof(DWORD)) = STUB_SIZE;
-        *(DWORD *) (boilerplate + OFFSET_OF_RSRC_VIRTSIZE + 3*sizeof(DWORD)) = bsize + out->size;
-
-        HANDLE hDump = CreateFile("dump", GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+        HANDLE hDump = CreateFile("dump.exe", GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
         if(hDump == INVALID_HANDLE_VALUE) {
             throw PACKER_EXCEPTION("[!] Error: PACKED: Could not create packed file dump handle\n");
         }
         long unsigned int bytes = 0;
-        if(!WriteFile(hDump, boilerplate, bsize, &bytes, NULL)) {
+        if(!WriteFile(hDump, resource_data, resource_size, &bytes, NULL)) {
             throw PACKER_EXCEPTION("[!] Error: PACKED: Could not dump adjusted tinyPE\n");
         }
         if(!WriteFile(hDump, out->content, out->size, &bytes, NULL)) {
@@ -98,16 +91,11 @@ bool PACKER::packfile() {
 
     } catch(const PACKER_EXCEPTION &e) {
         printf("[!] Error: PACKED: An exception has occurred durng file compression: \n%s", e.what());
-        DELETE_DATA(in);
+        DELETE_DATA(mappedImage);
         DELETE_DATA(out);
 
         return false;
     }
     printf("a ajuns aici 3\n");
     return true;
-    // initialize compressor
-    // parse PE
-    // compress PE
-    // get boilerplate
-    // insert data in data section
 }

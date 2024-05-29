@@ -1,6 +1,6 @@
 CC = g++
 CFLAGS = -m64 -g -std=c++17 -pthread -c -Wall -Werror
-LDFLAGS = -static
+LDFLAGS =  
 
 EFLAGS = $(foreach dir,$(EXTERN_DIRS),-I$(dir))
 EXTERN_DIRS = extern/brieflz/include extern/cxxopts/include
@@ -16,7 +16,7 @@ OBJ = main.o packer.o compressor.o parser.o
 
 enigma : $(OBJ)
 		@echo "Building final executable file..."
-		$(CC) $(LDFLAGS) $(OBJ) $(BRIEFL_LIB) -I$(UTILS_DIR_PE) -o enigma
+		$(CC) $(LDFLAGS) $(OBJ) $(BRIEFL_LIB) -I$(UTILS_DIR_PE) utils/boilerplate/packed.res -o enigma
 		rm -rf $(OBJ_CLEAN)
 
 main.o : packer.o parser.o compressor.o

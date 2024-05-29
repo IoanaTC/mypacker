@@ -1,13 +1,13 @@
 CC = cl
 LINK = link
 
-COMPRESSOR = ..\extern\lz4\lib
+COMPRESSOR = ..\extern\brieflz
 LISTING_FILES = saved_listing_file
 MAP_FILE = map_file
 
 # compiler and linker flags
-CFLAGS = /DDEFINE_MACRO /I$(COMPRESSOR) /FAcs /Fa$(LISTING_FILES) /MT /GR- /EHs-c-
-LFLAGS = /LIBPATH:$(COMPRESSOR) /NODEFAULTLIB /MAP:$(MAP_FILE) /INCREMENTAL:NO
+CFLAGS = /DDEFINE_MACRO /I$(COMPRESSOR)\include /FAcs /Fa$(LISTING_FILES) /MT /GR- /EHs-c-
+LFLAGS = /LIBPATH:$(COMPRESSOR)\build\Release\brieflz.lib kernel32.lib /NODEFAULTLIB /MAP:$(MAP_FILE) /INCREMENTAL:NO
 
 # source files
 SRCS = stub.cpp

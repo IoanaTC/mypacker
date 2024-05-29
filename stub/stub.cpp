@@ -1,6 +1,6 @@
 #include <Windows.h>
 
-#include "lz4.h"
+#include "brieflz.h"
 #include "GlobalExternVariables.h"
 
 #pragma data_seg(".A$A")
@@ -12,15 +12,7 @@ __declspec(allocate(".A$A")) extern struct GlobalExternVariables genv = {};
 #pragma comment(linker, "/MERGE:.bss=.A")
 
 unsigned long long load_address = 0;
-/*
-struct section_header {
-    unsigned int RVA_to_section;
-    unsigned int size;
-};
-IMAGE_DATA_DIRECTORY original_data_directory;
-//IMAGE_NUMBEROF_DIRECTORY_ENTRIES 16
-*/
-
+#pragma comment(lib, "kernel32.lib")
 // compiler directive that allows me
 // to instruct the linker to set this symbol StubEntryPoint to serve as an entry point function
 // thus the program should start executing from the StubEntryPoint() function
@@ -29,31 +21,11 @@ IMAGE_DATA_DIRECTORY original_data_directory;
 // the affordmentioned function, it is a Microsoft directive
 // this allows me to write assembly code directly into the function body
 //
-// decompressor class
 void __declspec(noinline) StubEntryPoint() {
-    load_address = (unsigned long long) StubEntryPoint - genv.RVA_to_stub_entry_point;
-    // first the stub needs to locate the compressed data
-    // thus, it needs to find the offsets to the sections of
-    // the executable it is currently injecting itself into
-    //
-
-    /*
-    // starting from the load address it needs to get to the e_lfanew offset
-    unsigned long long * offset = load_address;
-    offset += 0x3C;
-
-    // now thw offset needs to jump to the address written here
-    offset += *offset;
-
-    // finally, in order to get to the packed data, it needs to find the sections
-    // in order to manage that, i find the size of optional header and jump over it
-    offset += 0x14; // current offset = size of optional header
-    offset += *offset + 0x2; // current offset = section headers
-
-    // the stub reached the start of the compressed data
-    // i need the size of the sections
-    //
-    */
-
+    HMODULE hModule = GetModuleHandle(NULL);
+    
+    HANDLE dump = CreateFile("dump_by_stub", GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+    long unsigned int bytes = 0;
+    WriteFile(dump, hModule, sizeof(HMODULE), &bytes, NULL);
 }
 
