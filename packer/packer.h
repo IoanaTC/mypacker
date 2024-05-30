@@ -1,6 +1,8 @@
 #pragma once
 
 #define IDR_RES 102
+#define MZ_HEADER 0x00005A4D
+#define IMAGE_SCN_MEM_READ 0x40000000
 
 class PACKER {
     public:

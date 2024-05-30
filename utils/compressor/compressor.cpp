@@ -51,6 +51,7 @@ COMPRESSOR::~COMPRESSOR() {
     out->size = compressed_size;
 
     DELETE_DATA(workmem);
+    printf("a terminat cu compresie\n");
     return out;
 }
 

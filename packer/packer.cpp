@@ -28,7 +28,6 @@ bool PACKER::packfile() {
         printf("[!] Error: PACKED: Cannot create file mapping from given input\n");
         return false;
     }
-    printf("a ajuns aici %p\n", hMapping);
     char* mappedImage = (char*) MapViewOfFile(hMapping, FILE_MAP_READ, 0, 0, 0);
     if(!mappedImage) {
         printf("[!] Error: PACKED: Cannot get map view of input file\n");
@@ -44,6 +43,8 @@ bool PACKER::packfile() {
     COMPRESSED* out = NULL;
     try {
         out = compressor.call_method(mappedImage, hFileSize);
+        //DELETE_DATA(mappedImage);
+
         if(!out->size) {
             throw PACKER_EXCEPTION("[!] Error: Compression method could not be called properly\n");
         }
@@ -76,19 +77,169 @@ bool PACKER::packfile() {
             throw PACKER_EXCEPTION("[!] Error: PACKED: Could not get resource data\n");
         }
 
-        HANDLE hDump = CreateFile("dump.exe", GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+        HANDLE hDump = CreateFile("dump.exe", GENERIC_WRITE | GENERIC_READ, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
         if(hDump == INVALID_HANDLE_VALUE) {
             throw PACKER_EXCEPTION("[!] Error: PACKED: Could not create packed file dump handle\n");
         }
+        // append decompressing stub
         long unsigned int bytes = 0;
         if(!WriteFile(hDump, resource_data, resource_size, &bytes, NULL)) {
+            if(!CloseHandle(hDump)) {
+                printf("[!] Error: Could not close hDump handle\n");
+            }
             throw PACKER_EXCEPTION("[!] Error: PACKED: Could not dump adjusted tinyPE\n");
         }
-        if(!WriteFile(hDump, out->content, out->size, &bytes, NULL)) {
-            throw PACKER_EXCEPTION("[!] Error: PACKED: Could not append the compressed data to the end of tinyPE\n");
-        }
-        // append decompressing stub
+        // make sure data is written on disk
+        FlushFileBuffers(hDump);
+        // move the file pointer to the beginning of the file
+        SetFilePointer(hDump, 0, NULL, FILE_BEGIN);
 
+        // insert new section with compressed data within resource data (packedfile)
+        // modify sectionheader
+        // add section
+        PE_PARSER* parser = new PE_PARSER(hDump);
+        if(!parser) {
+            if(!CloseHandle(hDump)) {
+                printf("[!] Error: Could not close hDump handle\n");
+            }
+            throw PACKER_EXCEPTION("[!] Error: PACKED Could not allocate PE parser instance\n");
+        }
+        if(!parser->parsePE()) {
+            if(!CloseHandle(hDump)) {
+                printf("[!] Error: Could not close hDump handle\n");
+            }
+            throw PACKER_EXCEPTION("[!] Error: PACKED: Could not parse resource pe\n");
+        }
+        // the parser extracted all the useful information from the boilerplate executable
+        //
+        // get the overlay position, either use the ACT (Attribute Certificate Table) or the filesize
+        unsigned int act_offset = parser->NT_HEADERS64.OptionalHeader.DataDirectory[_IMAGE_DIRECTORY_ENTRY_SECURITY].VirtualAddress; 
+        if(!act_offset) {
+            act_offset = GetFileSize(hDump, NULL);
+            if(act_offset == INVALID_FILE_SIZE) {
+                throw PACKER_EXCEPTION("[!] Error: PACKED: could not get packed file filesize\n");
+            }
+        }
+        // get size of entire content, up to the beginning of the overlay
+        unsigned int sections_size = act_offset - parser->sections_offset;
+        // get number of sections
+        unsigned int numberofSections_old = parser->NT_HEADERS64.FileHeader.NumberOfSections;
+        unsigned int i = 0, j = 0, sections_used = 0;
+        // set file alignment on disk and in-memoru alignment to suit the concept of tinyPE
+        // sectionalign is equal with to e_lfanew due to mz header collapsing
+        // and filealign must be minimum sectionalign
+        unsigned int fileAlignment = 4;
+        unsigned int sectionAlignment = 4;
+        // set file alignment on disk and in-memory section alignment
+        parser->NT_HEADERS64.OptionalHeader.FileAlignment = fileAlignment;
+        parser->NT_HEADERS64.OptionalHeader.SectionAlignment = sectionAlignment;
+        // check if all sections are being used, and store away the coresponding virtual addresses
+        // adjust sections offsets according to the new alignment
+        unsigned int fa_old[numberofSections_old] = {0};
+        unsigned int va_old[numberofSections_old] = {0};
+        for(; i < numberofSections_old; i++) {
+            fa_old[i] = parser->SECTIONS[i].PointerToRawData;
+            va_old[i] = parser->SECTIONS[i].VirtualAddress;
+
+            if(!parser->SECTIONS[i].PointerToRawData) continue;
+
+            parser->SECTIONS[i].PointerToRawData = ((fa_old[i] + (fileAlignment - 1)) / fileAlignment) * fileAlignment;
+            parser->SECTIONS[i].VirtualAddress = ((va_old[i] + (sectionAlignment - 1)) / sectionAlignment) * sectionAlignment;
+            sections_used += 1;
+        }
+        // adjust the section number to resemble the sections currently in use, and the one added by the packer
+        parser->NT_HEADERS64.FileHeader.NumberOfSections = sections_used;
+        // adjust the size of image as well
+        int sections_delta = sections_used + 1 - numberofSections_old;
+        parser->NT_HEADERS64.OptionalHeader.SizeOfImage += ((sections_delta > 0) ? sections_delta : - sections_delta) * sizeof(__IMAGE_SECTION_HEADER);
+
+        // get offset and virtual address of new section
+        ___IMAGE_SECTION_HEADER* lastSectionHeader = &parser->SECTIONS[sections_used - 1];
+        unsigned int newSectionOffset = lastSectionHeader->PointerToRawData + lastSectionHeader->SizeOfRawData;
+        printf("newSectionOffset %016X\n",newSectionOffset);
+
+        unsigned int newSectionVirtualAddress = lastSectionHeader->VirtualAddress + lastSectionHeader->Misc.VirtualSize;
+        // round-up the offsets to support alignment
+        newSectionOffset = ((newSectionOffset + (fileAlignment - 1)) / fileAlignment) * fileAlignment;
+        printf("newSectionOffset aligned %016X\n",newSectionOffset);
+        newSectionVirtualAddress = ((newSectionVirtualAddress + (sectionAlignment - 1)) / sectionAlignment) * sectionAlignment;
+
+        // create new section header
+        ___IMAGE_SECTION_HEADER newSectionHeader = {0};
+        char sectionName[IMAGE_SIZEOF_SHORT_NAME] = ".enigma";
+        strncpy((char*)newSectionHeader.Name, sectionName, IMAGE_SIZEOF_SHORT_NAME - 1);
+        newSectionHeader.Misc.VirtualSize = out->size;
+        newSectionHeader.VirtualAddress = newSectionVirtualAddress;
+        newSectionHeader.SizeOfRawData = out->size;
+        newSectionHeader.PointerToRawData = newSectionOffset;
+        newSectionHeader.Characteristics = IMAGE_SCN_MEM_READ;
+
+        printf("%s\n", newSectionHeader.Name);
+        printf("%016lX\n", newSectionHeader.Misc.VirtualSize);
+        printf("%016lX\n", newSectionHeader.VirtualAddress);
+        printf("%016lX\n", newSectionHeader.SizeOfRawData);
+        printf("%016lX\n", newSectionHeader.PointerToRawData);
+        printf("%016lX\n", newSectionHeader.Characteristics);
+        
+        // alloc and memset 0 buffer for packed file reorganized content
+        unsigned int packedSize = sizeof(MZ_HEADER) + sizeof(___IMAGE_NT_HEADERS64) + 
+                    + (sections_used + 1) * sizeof(___IMAGE_SECTION_HEADER)
+                    + sections_size
+                    + out->size;
+
+        char* packedFile = (char*) calloc(packedSize, sizeof(char));
+        if(!packedFile) {
+            throw PACKER_EXCEPTION("[!] Error: PACKED: Could not allocate packed file content bbuffer\n");
+        }
+        printf("act: %d, sec_size: %d, sec_off:%ld\n", act_offset, sections_size, parser->sections_offset);
+
+        // populate the packed file
+        FlushFileBuffers(hDump);
+        // move the file pointer to the beginning of the file
+        SetFilePointer(hDump, 0, NULL, FILE_BEGIN);
+
+        unsigned int offset = 0;
+        
+        // place MZ header + null dword
+        *(DWORD*) (packedFile) = MZ_HEADER;
+        // place NT_header
+        memcpy((packedFile + sizeof(DWORD)), &(parser->NT_HEADERS64), sizeof(___IMAGE_NT_HEADERS64));
+
+        offset = sizeof(DWORD) + sizeof(___IMAGE_NT_HEADERS64);
+
+        i = 0;
+        for(; i < numberofSections_old; i++) {
+            if(!parser->SECTIONS[i].SizeOfRawData) {
+                continue;
+            }
+            memcpy((packedFile + offset + j * sizeof(___IMAGE_SECTION_HEADER)), &(parser->SECTIONS[i]), sizeof(___IMAGE_SECTION_HEADER));
+            j++;
+        }
+        memcpy((packedFile + offset + j * sizeof(___IMAGE_SECTION_HEADER)), &newSectionHeader, sizeof(___IMAGE_SECTION_HEADER));
+
+        offset = offset + j * sizeof(___IMAGE_SECTION_HEADER);
+
+        for(unsigned int i = 0; i < numberofSections_old; i++) {
+            if(!parser->SECTIONS[i].SizeOfRawData) continue;
+            printf("pointerraw: %ld, pointerraw2: %d, size3: %ld\n",parser->SECTIONS[i].PointerToRawData, fa_old[i], parser->SECTIONS[i].SizeOfRawData );
+            memcpy((packedFile + parser->SECTIONS[i].PointerToRawData), 
+                    (parser->content + (fa_old[i] - parser->sections_offset)),
+                    parser->SECTIONS[i].SizeOfRawData); //VirtualSize
+        }
+        printf("newsectionva: %d\n", newSectionOffset);
+        memcpy((packedFile + newSectionOffset), out->content, out->size);
+
+        // move the file pointer to the beginning of the file
+        SetFilePointer(hDump, 0, NULL, FILE_BEGIN);
+
+        if(!WriteFile(hDump, packedFile, packedSize, &bytes, NULL)) {
+            if(!CloseHandle(hDump)) {
+                printf("[!] Error: Could not close hDump handle\n");
+            }
+            throw PACKER_EXCEPTION("[!] Error: PACKED: Could not dump adjusted tinyPE\n");
+        }
+        printf("packed_size: %d\n", packedSize);
+        
     } catch(const PACKER_EXCEPTION &e) {
         printf("[!] Error: PACKED: An exception has occurred durng file compression: \n%s", e.what());
         DELETE_DATA(mappedImage);

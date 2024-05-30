@@ -196,12 +196,13 @@ BOOL PE_PARSER::parseSectionHeader() {
     }
     DWORD bytesRead = 0;
     for(unsigned int counter = 0; counter < numberofSections; counter++) {
-        if(!SetFilePointer(inputFile, counter * sizeofSectionHeader, NULL, FILE_CURRENT)) {
+        if(!SetFilePointer(inputFile, FAofSections + counter * sizeofSectionHeader, NULL, FILE_BEGIN)) {
             throw PARSER_EXCEPTION("[-] Error: Could not set file pointer to beging of current section\n");
         }
         if(!ReadFile(inputFile, &SECTIONS[counter], sizeofSectionHeader, &bytesRead, NULL) || bytesRead != sizeofSectionHeader) {
             throw PARSER_EXCEPTION("[-] Error: Could not read from current file pointer, section header\n");
         }
+        printf("%s\n", SECTIONS[counter].Name);
     }
     this->sections_offset = FAofSections + numberofSections * sizeofSectionHeader;
     printf("[+] Section Header successfully read.\n");
@@ -217,7 +218,14 @@ BOOL PE_PARSER::getSections() {
     }
     // get ACT offset from DataDirectory.SecurityDirectory
     unsigned int act_offset = NT_HEADERS64.OptionalHeader.DataDirectory[_IMAGE_DIRECTORY_ENTRY_SECURITY].VirtualAddress; 
+    if(!act_offset) {
+        act_offset = GetFileSize(inputFile, NULL);
+        if(act_offset == INVALID_FILE_SIZE) {
+            throw PARSER_EXCEPTION("[!] Error: could not get input file filesize\n");
+        }
+    }
     unsigned int sections_size = act_offset - sections_offset;
+    printf("act: %d, sec_size: %d, sec_off:%ld\n", act_offset, sections_size, sections_offset);
 
     if(sections_size > act_offset) {
         throw PARSER_EXCEPTION("[-] Error: Overflowed when computed sections_size\n");
@@ -231,11 +239,19 @@ BOOL PE_PARSER::getSections() {
     }
     DWORD bytesRead = 0;
     if(!ReadFile(inputFile, content, sections_size, &bytesRead, NULL) || (bytesRead != sections_size)) {
+        cout<<"error: " << GetLastError()<<"\n";
+        printf("%p %ld\n", inputFile, bytesRead);
         throw PARSER_EXCEPTION("[-] Error: Could not read ssection content from input file\n");
     }
     content[sections_size] = 0;
     printf("[+] Sections Content succesfully read.\n");
     return true;
+}
+char* PE_PARSER::getContent() {
+    return this->content;
+}
+long unsigned int PE_PARSER::getSectionsOffset() {
+    return this->sections_offset;
 }
 //
 // main parser
@@ -247,6 +263,8 @@ BOOL PE_PARSER::parsePE() {
         parseDosHeader();
         parseDosStub();
         parseNTHeaders();
+        parseSectionHeader();
+        getSections();
         //
     } catch (const PARSER_EXCEPTION &e) {
         printf(e.what());

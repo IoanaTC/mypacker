@@ -8,7 +8,7 @@
 
 class PE_PARSER
 {
-    private:
+    public:
         __IMAGE_DOS_HEADER         DOS_HEADER;
         __IMAGE_DOS_STUB           DOS_STUB;
 
@@ -24,7 +24,7 @@ class PE_PARSER
 
         HANDLE inputFile;
 
-    public:
+    //public:
         PE_PARSER(HANDLE inputFile);
         ~PE_PARSER();
 
@@ -41,6 +41,9 @@ class PE_PARSER
         BOOL parseSectionHeader();
 
         BOOL getSections();
+
+        char* getContent();
+        long unsigned int getSectionsOffset();
 };
 
 typedef class _PARSER_EXCEPTION : public std::exception 

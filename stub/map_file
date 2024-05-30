@@ -1,6 +1,6 @@
  stub
 
- Timestamp is 665716ab (Wed May 29 14:51:07 2024)
+ Timestamp is 665849ed (Thu May 30 12:42:05 2024)
 
  Preferred load address is 0000000180000000
 
@@ -51,21 +51,21 @@
  0000:00000000       __hybrid_image_info_bitfield 0000000000000000     <absolute>
  0000:00000000       __x64_code_ranges_to_entry_points 0000000000000000     <absolute>
  0000:00000000       __x64_code_ranges_to_entry_points_count 0000000000000000     <absolute>
- 0001:00000000       ?StubEntryPoint@@YAXXZ     0000000180001000 f   stub.obj
- 0003:00000000       __imp_WriteFile            0000000180003000     kernel32:KERNEL32.dll
- 0003:00000008       __imp_GetModuleHandleA     0000000180003008     kernel32:KERNEL32.dll
- 0003:00000010       __imp_CreateFileA          0000000180003010     kernel32:KERNEL32.dll
- 0003:00000018       \177KERNEL32_NULL_THUNK_DATA 0000000180003018     kernel32:KERNEL32.dll
- 0003:00000020       __IMPORT_DESCRIPTOR_KERNEL32 0000000180003020     kernel32:KERNEL32.dll
- 0003:00000034       __NULL_IMPORT_DESCRIPTOR   0000000180003034     kernel32:KERNEL32.dll
- 0004:00000000       ?genv@@3UGlobalExternVariables@@A 0000000180004000     stub.obj
- 0004:00000010       ?load_address@@3_KA        0000000180004010     stub.obj
- 0004:00000044       __volatile_metadata        0000000180004044     <linker-defined>
+ 0001:00000000       ?StubEntryPoint@@YAXXZ     0000000180000260 f   stub.obj
+ 0003:00000000       __imp_WriteFile            00000001800002f0     kernel32:KERNEL32.dll
+ 0003:00000008       __imp_GetModuleHandleA     00000001800002f8     kernel32:KERNEL32.dll
+ 0003:00000010       __imp_CreateFileA          0000000180000300     kernel32:KERNEL32.dll
+ 0003:00000018       \177KERNEL32_NULL_THUNK_DATA 0000000180000308     kernel32:KERNEL32.dll
+ 0003:00000020       __IMPORT_DESCRIPTOR_KERNEL32 0000000180000310     kernel32:KERNEL32.dll
+ 0003:00000034       __NULL_IMPORT_DESCRIPTOR   0000000180000324     kernel32:KERNEL32.dll
+ 0004:00000000       ?genv@@3UGlobalExternVariables@@A 00000001800003a0     stub.obj
+ 0004:00000010       ?load_address@@3_KA        00000001800003b0     stub.obj
+ 0004:00000044       __volatile_metadata        00000001800003e4     <linker-defined>
 
  entry point at        0001:00000000
 
  Static symbols
 
- 0003:00000096       .idata$6                   0000000180003096     kernel32:KERNEL32.dll
- 0004:00000018       $SG93173                   0000000180004018     stub.obj
- 0004:00000160       $unwind$?StubEntryPoint@@YAXXZ 0000000180004160     stub.obj
+ 0003:00000096       .idata$6                   0000000180000386     kernel32:KERNEL32.dll
+ 0004:00000018       $SG93173                   00000001800003b8     stub.obj
+ 0004:00000160       $unwind$?StubEntryPoint@@YAXXZ 0000000180000500     stub.obj
