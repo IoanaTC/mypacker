@@ -35,6 +35,7 @@ COMPRESSOR::~COMPRESSOR() {
         throw COMPRESSOR_EXCEPTION("[!] Error: brieflz: Could not allocate output buffer\n");
     }
     out->content = (char*) (out + 1);
+    out->original_size = hFileSize;
     //get required size for temporary buffer 'workmem'
     long unsigned int workmem_size_level = blz_workmem_size_level(hFileSize, BRIEFL_COMPRESSION_LEVEL);
     if(!workmem_size_level) {
@@ -50,7 +51,17 @@ COMPRESSOR::~COMPRESSOR() {
     long unsigned int compressed_size = blz_pack_level(in, out->content, hFileSize, workmem, BRIEFL_COMPRESSION_LEVEL);
     out->size = compressed_size;
 
+    long unsigned int bytes = 0;
+    HANDLE compressedexe = CreateFile("compressed.exe", GENERIC_WRITE | GENERIC_READ, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+    WriteFile(compressedexe, out->content, out->size, &bytes, NULL);
     DELETE_DATA(workmem);
+
+    char* decompressed = (char*) malloc(hFileSize * sizeof(char));
+    blz_depack(out->content, decompressed, hFileSize);
+
+    printf("sunt la fel? %d\n", memcmp(decompressed, in, out->original_size));
+    HANDLE decompressedexe = CreateFile("decompressed.exe", GENERIC_WRITE | GENERIC_READ, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+    WriteFile(decompressedexe, decompressed, out->original_size, &bytes, NULL);
     printf("a terminat cu compresie\n");
     return out;
 }

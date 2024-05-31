@@ -5,89 +5,303 @@ include listing.inc
 INCLUDELIB LIBCMT
 INCLUDELIB OLDNAMES
 
-PUBLIC	?genv@@3UGlobalExternVariables@@A		; genv
-PUBLIC	?load_address@@3_KA				; load_address
-_BSS	SEGMENT
-?load_address@@3_KA DQ 01H DUP (?)			; load_address
-_BSS	ENDS
 CONST	SEGMENT
-$SG93173 DB	'dump_by_stub', 00H
+$SG93184 DB	'brieflz.dll', 00H
+	ORG $+4
+$SG93185 DB	'msvcrt.dll', 00H
+	ORG $+1
+$SG93186 DB	'malloc', 00H
+	ORG $+1
+$SG93187 DB	'memcpy', 00H
+	ORG $+5
+$SG93189 DB	'blz_depack_safe', 00H
+$SG93190 DB	'dump_by_stub', 00H
 CONST	ENDS
-A$A	SEGMENT
-?genv@@3UGlobalExternVariables@@A	ORG $+12		; genv
-A$A	ENDS
 PUBLIC	?StubEntryPoint@@YAXXZ				; StubEntryPoint
 EXTRN	__imp_CreateFileA:PROC
 EXTRN	__imp_WriteFile:PROC
+EXTRN	__imp_CloseHandle:PROC
 EXTRN	__imp_GetModuleHandleA:PROC
+EXTRN	__imp_GetProcAddress:PROC
+EXTRN	__imp_LoadLibraryA:PROC
 pdata	SEGMENT
-$pdata$?StubEntryPoint@@YAXXZ DD imagerel $LN3
-	DD	imagerel $LN3+120
+$pdata$?StubEntryPoint@@YAXXZ DD imagerel $LN4
+	DD	imagerel $LN4+537
 	DD	imagerel $unwind$?StubEntryPoint@@YAXXZ
 pdata	ENDS
 xdata	SEGMENT
-$unwind$?StubEntryPoint@@YAXXZ DD 010401H
-	DD	0c204H
+$unwind$?StubEntryPoint@@YAXXZ DD 020701H
+	DD	01b0107H
 xdata	ENDS
 ; Function compile flags: /Odtp
 ; File D:\licenta\mypacker\stub\stub.cpp
 _TEXT	SEGMENT
-bytes$ = 64
-hModule$ = 72
-dump$ = 80
+off$ = 64
+origS$ = 68
+load_address$ = 72
+nSec$ = 80
+bytes$ = 84
+pSec$ = 88
+VS$ = 96
+msvcrtDLL$ = 104
+pNt$ = 112
+malloc$ = 120
+com$ = 128
+dec$ = 136
+dump$ = 144
+size$ = 152
+VA$ = 160
+memcpy$ = 168
+brieflzDLL$ = 176
+blz_depack_safe$ = 184
+BA$ = 192
 ?StubEntryPoint@@YAXXZ PROC				; StubEntryPoint
 
-; 24   : void __declspec(noinline) StubEntryPoint() {
+; 22   : void __declspec(noinline) StubEntryPoint() {
 
-$LN3:
-  00000	48 83 ec 68	 sub	 rsp, 104		; 00000068H
+$LN4:
+  00000	48 81 ec d8 00
+	00 00		 sub	 rsp, 216		; 000000d8H
 
-; 25   :     HMODULE hModule = GetModuleHandle(NULL);
+; 23   : 
+; 24   :     HMODULE brieflzDLL = LoadLibrary("brieflz.dll");
 
-  00004	33 c9		 xor	 ecx, ecx
-  00006	ff 15 00 00 00
+  00007	48 8d 0d 00 00
+	00 00		 lea	 rcx, OFFSET FLAT:$SG93184
+  0000e	ff 15 00 00 00
+	00		 call	 QWORD PTR __imp_LoadLibraryA
+  00014	48 89 84 24 b0
+	00 00 00	 mov	 QWORD PTR brieflzDLL$[rsp], rax
+
+; 25   :     HMODULE msvcrtDLL = LoadLibrary("msvcrt.dll");
+
+  0001c	48 8d 0d 00 00
+	00 00		 lea	 rcx, OFFSET FLAT:$SG93185
+  00023	ff 15 00 00 00
+	00		 call	 QWORD PTR __imp_LoadLibraryA
+  00029	48 89 44 24 68	 mov	 QWORD PTR msvcrtDLL$[rsp], rax
+
+; 26   : 
+; 27   :     typedef void* (*MallocFunction)(size_t);
+; 28   :     MallocFunction malloc = (MallocFunction) GetProcAddress(msvcrtDLL, "malloc");
+
+  0002e	48 8d 15 00 00
+	00 00		 lea	 rdx, OFFSET FLAT:$SG93186
+  00035	48 8b 4c 24 68	 mov	 rcx, QWORD PTR msvcrtDLL$[rsp]
+  0003a	ff 15 00 00 00
+	00		 call	 QWORD PTR __imp_GetProcAddress
+  00040	48 89 44 24 78	 mov	 QWORD PTR malloc$[rsp], rax
+
+; 29   :     typedef void* (__cdecl *MemcpyFunction)(void*, const void*, size_t);
+; 30   :     MemcpyFunction memcpy = (MemcpyFunction) GetProcAddress(msvcrtDLL, "memcpy");
+
+  00045	48 8d 15 00 00
+	00 00		 lea	 rdx, OFFSET FLAT:$SG93187
+  0004c	48 8b 4c 24 68	 mov	 rcx, QWORD PTR msvcrtDLL$[rsp]
+  00051	ff 15 00 00 00
+	00		 call	 QWORD PTR __imp_GetProcAddress
+  00057	48 89 84 24 a8
+	00 00 00	 mov	 QWORD PTR memcpy$[rsp], rax
+
+; 31   : 
+; 32   :     // get the parent executable base address
+; 33   :     HMODULE load_address = GetModuleHandle(NULL);
+
+  0005f	33 c9		 xor	 ecx, ecx
+  00061	ff 15 00 00 00
 	00		 call	 QWORD PTR __imp_GetModuleHandleA
-  0000c	48 89 44 24 48	 mov	 QWORD PTR hModule$[rsp], rax
+  00067	48 89 44 24 48	 mov	 QWORD PTR load_address$[rsp], rax
 
-; 26   :     
-; 27   :     HANDLE dump = CreateFile("dump_by_stub", GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+; 34   :     if(!load_address) {
 
-  00011	48 c7 44 24 30
+  0006c	48 83 7c 24 48
+	00		 cmp	 QWORD PTR load_address$[rsp], 0
+  00072	75 05		 jne	 SHORT $LN2@StubEntryP
+
+; 35   :         return;
+
+  00074	e9 98 01 00 00	 jmp	 $LN1@StubEntryP
+$LN2@StubEntryP:
+
+; 36   :     }
+; 37   : 
+; 38   :     // get to the section header
+; 39   :     unsigned int off = sizeof(DWORD);
+
+  00079	c7 44 24 40 04
+	00 00 00	 mov	 DWORD PTR off$[rsp], 4
+
+; 40   :     PIMAGE_NT_HEADERS64 pNt = (PIMAGE_NT_HEADERS64)((BYTE*)load_address + off);
+
+  00081	8b 44 24 40	 mov	 eax, DWORD PTR off$[rsp]
+  00085	48 8b 4c 24 48	 mov	 rcx, QWORD PTR load_address$[rsp]
+  0008a	48 03 c8	 add	 rcx, rax
+  0008d	48 8b c1	 mov	 rax, rcx
+  00090	48 89 44 24 70	 mov	 QWORD PTR pNt$[rsp], rax
+
+; 41   :     unsigned long long BA = pNt->OptionalHeader.ImageBase;
+
+  00095	48 8b 44 24 70	 mov	 rax, QWORD PTR pNt$[rsp]
+  0009a	48 8b 40 30	 mov	 rax, QWORD PTR [rax+48]
+  0009e	48 89 84 24 c0
+	00 00 00	 mov	 QWORD PTR BA$[rsp], rax
+
+; 42   : 
+; 43   :     DWORD nSec = pNt->FileHeader.NumberOfSections;
+
+  000a6	48 8b 44 24 70	 mov	 rax, QWORD PTR pNt$[rsp]
+  000ab	0f b7 40 06	 movzx	 eax, WORD PTR [rax+6]
+  000af	89 44 24 50	 mov	 DWORD PTR nSec$[rsp], eax
+
+; 44   :     off += sizeof(IMAGE_NT_HEADERS64) + nSec * sizeof(IMAGE_SECTION_HEADER);
+
+  000b3	8b 44 24 50	 mov	 eax, DWORD PTR nSec$[rsp]
+  000b7	48 6b c0 28	 imul	 rax, rax, 40		; 00000028H
+  000bb	8b 4c 24 40	 mov	 ecx, DWORD PTR off$[rsp]
+  000bf	48 8d 84 01 08
+	01 00 00	 lea	 rax, QWORD PTR [rcx+rax+264]
+  000c7	89 44 24 40	 mov	 DWORD PTR off$[rsp], eax
+
+; 45   : 
+; 46   :     PIMAGE_SECTION_HEADER pSec = (PIMAGE_SECTION_HEADER)((BYTE*) load_address + off);
+
+  000cb	8b 44 24 40	 mov	 eax, DWORD PTR off$[rsp]
+  000cf	48 8b 4c 24 48	 mov	 rcx, QWORD PTR load_address$[rsp]
+  000d4	48 03 c8	 add	 rcx, rax
+  000d7	48 8b c1	 mov	 rax, rcx
+  000da	48 89 44 24 58	 mov	 QWORD PTR pSec$[rsp], rax
+
+; 47   :     unsigned long long VS = pSec->SizeOfRawData;
+
+  000df	48 8b 44 24 58	 mov	 rax, QWORD PTR pSec$[rsp]
+  000e4	8b 40 10	 mov	 eax, DWORD PTR [rax+16]
+  000e7	48 89 44 24 60	 mov	 QWORD PTR VS$[rsp], rax
+
+; 48   :     unsigned long long VA = pSec->PointerToRawData;
+
+  000ec	48 8b 44 24 58	 mov	 rax, QWORD PTR pSec$[rsp]
+  000f1	8b 40 14	 mov	 eax, DWORD PTR [rax+20]
+  000f4	48 89 84 24 a0
+	00 00 00	 mov	 QWORD PTR VA$[rsp], rax
+
+; 49   : 
+; 50   :     // get data into a buffer and decompress using brieflz
+; 51   :     unsigned long origS = pSec->PointerToRelocations;
+
+  000fc	48 8b 44 24 58	 mov	 rax, QWORD PTR pSec$[rsp]
+  00101	8b 40 18	 mov	 eax, DWORD PTR [rax+24]
+  00104	89 44 24 44	 mov	 DWORD PTR origS$[rsp], eax
+
+; 52   : 
+; 53   :     BYTE* dec = (BYTE*) malloc(origS * sizeof(BYTE));
+
+  00108	8b 44 24 44	 mov	 eax, DWORD PTR origS$[rsp]
+  0010c	8b c8		 mov	 ecx, eax
+  0010e	ff 54 24 78	 call	 QWORD PTR malloc$[rsp]
+  00112	48 89 84 24 88
+	00 00 00	 mov	 QWORD PTR dec$[rsp], rax
+
+; 54   :     BYTE* com = (BYTE*) malloc(VS * sizeof(BYTE));
+
+  0011a	48 8b 4c 24 60	 mov	 rcx, QWORD PTR VS$[rsp]
+  0011f	ff 54 24 78	 call	 QWORD PTR malloc$[rsp]
+  00123	48 89 84 24 80
+	00 00 00	 mov	 QWORD PTR com$[rsp], rax
+
+; 55   :     memcpy(com, ((BYTE*) load_address + VA), VS);
+
+  0012b	48 8b 84 24 a0
+	00 00 00	 mov	 rax, QWORD PTR VA$[rsp]
+  00133	48 8b 4c 24 48	 mov	 rcx, QWORD PTR load_address$[rsp]
+  00138	48 03 c8	 add	 rcx, rax
+  0013b	48 8b c1	 mov	 rax, rcx
+  0013e	4c 8b 44 24 60	 mov	 r8, QWORD PTR VS$[rsp]
+  00143	48 8b d0	 mov	 rdx, rax
+  00146	48 8b 8c 24 80
+	00 00 00	 mov	 rcx, QWORD PTR com$[rsp]
+  0014e	ff 94 24 a8 00
+	00 00		 call	 QWORD PTR memcpy$[rsp]
+
+; 56   : 
+; 57   :     //typedef unsigned long (*BLZ_DEPACK_FUNCTION)(const void *src, void *dst, unsigned long depacked_size);
+; 58   :     typedef unsigned long (*BLZ_DEPACK_FUNCTION)(const void *src, unsigned long src_size, void *dst, unsigned long depacked_size);
+; 59   :     BLZ_DEPACK_FUNCTION blz_depack_safe = (BLZ_DEPACK_FUNCTION)GetProcAddress(brieflzDLL, "blz_depack_safe");
+
+  00155	48 8d 15 00 00
+	00 00		 lea	 rdx, OFFSET FLAT:$SG93189
+  0015c	48 8b 8c 24 b0
+	00 00 00	 mov	 rcx, QWORD PTR brieflzDLL$[rsp]
+  00164	ff 15 00 00 00
+	00		 call	 QWORD PTR __imp_GetProcAddress
+  0016a	48 89 84 24 b8
+	00 00 00	 mov	 QWORD PTR blz_depack_safe$[rsp], rax
+
+; 60   :     //BLZ_DEPACK_FUNCTION blz_depack = (BLZ_DEPACK_FUNCTION)GetProcAddress(brieflzDLL, "blz_depack");
+; 61   : 
+; 62   :     unsigned long size = blz_depack_safe(com, VS, dec, origS);
+
+  00172	44 8b 4c 24 44	 mov	 r9d, DWORD PTR origS$[rsp]
+  00177	4c 8b 84 24 88
+	00 00 00	 mov	 r8, QWORD PTR dec$[rsp]
+  0017f	8b 54 24 60	 mov	 edx, DWORD PTR VS$[rsp]
+  00183	48 8b 8c 24 80
+	00 00 00	 mov	 rcx, QWORD PTR com$[rsp]
+  0018b	ff 94 24 b8 00
+	00 00		 call	 QWORD PTR blz_depack_safe$[rsp]
+  00192	89 84 24 98 00
+	00 00		 mov	 DWORD PTR size$[rsp], eax
+
+; 63   :     //unsigned long size = blz_depack(com, dec, origS);
+; 64   : 
+; 65   :     HANDLE dump = CreateFile("dump_by_stub", GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+
+  00199	48 c7 44 24 30
 	00 00 00 00	 mov	 QWORD PTR [rsp+48], 0
-  0001a	c7 44 24 28 80
+  001a2	c7 44 24 28 80
 	00 00 00	 mov	 DWORD PTR [rsp+40], 128	; 00000080H
-  00022	c7 44 24 20 02
+  001aa	c7 44 24 20 02
 	00 00 00	 mov	 DWORD PTR [rsp+32], 2
-  0002a	45 33 c9	 xor	 r9d, r9d
-  0002d	45 33 c0	 xor	 r8d, r8d
-  00030	ba 00 00 00 40	 mov	 edx, 1073741824		; 40000000H
-  00035	48 8d 0d 00 00
-	00 00		 lea	 rcx, OFFSET FLAT:$SG93173
-  0003c	ff 15 00 00 00
+  001b2	45 33 c9	 xor	 r9d, r9d
+  001b5	45 33 c0	 xor	 r8d, r8d
+  001b8	ba 00 00 00 40	 mov	 edx, 1073741824		; 40000000H
+  001bd	48 8d 0d 00 00
+	00 00		 lea	 rcx, OFFSET FLAT:$SG93190
+  001c4	ff 15 00 00 00
 	00		 call	 QWORD PTR __imp_CreateFileA
-  00042	48 89 44 24 50	 mov	 QWORD PTR dump$[rsp], rax
+  001ca	48 89 84 24 90
+	00 00 00	 mov	 QWORD PTR dump$[rsp], rax
 
-; 28   :     long unsigned int bytes = 0;
+; 66   :     long unsigned int bytes = 0;
 
-  00047	c7 44 24 40 00
+  001d2	c7 44 24 54 00
 	00 00 00	 mov	 DWORD PTR bytes$[rsp], 0
 
-; 29   :     WriteFile(dump, hModule, sizeof(HMODULE), &bytes, NULL);
+; 67   :     WriteFile(dump, dec, origS, &bytes, NULL);
 
-  0004f	48 c7 44 24 20
+  001da	48 c7 44 24 20
 	00 00 00 00	 mov	 QWORD PTR [rsp+32], 0
-  00058	4c 8d 4c 24 40	 lea	 r9, QWORD PTR bytes$[rsp]
-  0005d	41 b8 08 00 00
-	00		 mov	 r8d, 8
-  00063	48 8b 54 24 48	 mov	 rdx, QWORD PTR hModule$[rsp]
-  00068	48 8b 4c 24 50	 mov	 rcx, QWORD PTR dump$[rsp]
-  0006d	ff 15 00 00 00
+  001e3	4c 8d 4c 24 54	 lea	 r9, QWORD PTR bytes$[rsp]
+  001e8	44 8b 44 24 44	 mov	 r8d, DWORD PTR origS$[rsp]
+  001ed	48 8b 94 24 88
+	00 00 00	 mov	 rdx, QWORD PTR dec$[rsp]
+  001f5	48 8b 8c 24 90
+	00 00 00	 mov	 rcx, QWORD PTR dump$[rsp]
+  001fd	ff 15 00 00 00
 	00		 call	 QWORD PTR __imp_WriteFile
 
-; 30   : }
+; 68   :     CloseHandle(dump);
 
-  00073	48 83 c4 68	 add	 rsp, 104		; 00000068H
-  00077	c3		 ret	 0
+  00203	48 8b 8c 24 90
+	00 00 00	 mov	 rcx, QWORD PTR dump$[rsp]
+  0020b	ff 15 00 00 00
+	00		 call	 QWORD PTR __imp_CloseHandle
+$LN1@StubEntryP:
+
+; 69   : }
+
+  00211	48 81 c4 d8 00
+	00 00		 add	 rsp, 216		; 000000d8H
+  00218	c3		 ret	 0
 ?StubEntryPoint@@YAXXZ ENDP				; StubEntryPoint
 _TEXT	ENDS
 END

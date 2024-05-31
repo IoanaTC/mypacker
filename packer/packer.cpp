@@ -33,6 +33,12 @@ bool PACKER::packfile() {
         printf("[!] Error: PACKED: Cannot get map view of input file\n");
         return false;
     }
+    // get mapped size TODO
+    MEMORY_BASIC_INFORMATION mbi;
+    if (!VirtualQuery(mappedImage, &mbi, sizeof(mbi))) {
+        printf("[!] Error: PACKED: Cannot get map view of input file size\n");
+        return false;
+    }
     if(!CloseHandle(hMapping)) {
         printf("[!] Error: Cannot close hMapping handle\n");
         return false;
@@ -42,8 +48,10 @@ bool PACKER::packfile() {
     COMPRESSOR compressor(0);
     COMPRESSED* out = NULL;
     try {
-        out = compressor.call_method(mappedImage, hFileSize);
-        //DELETE_DATA(mappedImage);
+        out = compressor.call_method(mappedImage, mbi.RegionSize);
+        char* src = (char*) malloc(hFileSize * sizeof(char));
+        unsigned long size = blz_depack_safe(out->content, out->size, src, hFileSize);
+        printf("%ld\n", size);
 
         if(!out->size) {
             throw PACKER_EXCEPTION("[!] Error: Compression method could not be called properly\n");
@@ -150,8 +158,8 @@ bool PACKER::packfile() {
         // adjust the section number to resemble the sections currently in use, and the one added by the packer
         parser->NT_HEADERS64.FileHeader.NumberOfSections = sections_used;
         // adjust the size of image as well
-        int sections_delta = sections_used + 1 - numberofSections_old;
-        parser->NT_HEADERS64.OptionalHeader.SizeOfImage += ((sections_delta > 0) ? sections_delta : - sections_delta) * sizeof(__IMAGE_SECTION_HEADER);
+        //int sections_delta = sections_used + 1 - numberofSections_old;
+        //parser->NT_HEADERS64.OptionalHeader.SizeOfImage += ((sections_delta > 0) ? sections_delta : - sections_delta) * sizeof(__IMAGE_SECTION_HEADER);
 
         // get offset and virtual address of new section
         ___IMAGE_SECTION_HEADER* lastSectionHeader = &parser->SECTIONS[sections_used - 1];
@@ -172,6 +180,7 @@ bool PACKER::packfile() {
         newSectionHeader.VirtualAddress = newSectionVirtualAddress;
         newSectionHeader.SizeOfRawData = out->size;
         newSectionHeader.PointerToRawData = newSectionOffset;
+        newSectionHeader.PointerToRelocations = out->original_size /*mbi.RegionSize*/ /* hFileSize */ ;
         newSectionHeader.Characteristics = IMAGE_SCN_MEM_READ;
 
         printf("%s\n", newSectionHeader.Name);
@@ -182,10 +191,15 @@ bool PACKER::packfile() {
         printf("%016lX\n", newSectionHeader.Characteristics);
         
         // alloc and memset 0 buffer for packed file reorganized content
+        /*
         unsigned int packedSize = sizeof(MZ_HEADER) + sizeof(___IMAGE_NT_HEADERS64) + 
                     + (sections_used + 1) * sizeof(___IMAGE_SECTION_HEADER)
                     + sections_size
-                    + out->size;
+                    + out->size
+                    + 0x100;
+        */
+        unsigned int packedSize = newSectionVirtualAddress + out->size + 0x10 /*sizeof(___IMAGE_SECTION_HEADER)*/;
+        parser->NT_HEADERS64.OptionalHeader.SizeOfImage = newSectionVirtualAddress + out->size + 0x10 /*sizeof(___IMAGE_SECTION_HEADER)*/;
 
         char* packedFile = (char*) calloc(packedSize, sizeof(char));
         if(!packedFile) {
@@ -199,12 +213,10 @@ bool PACKER::packfile() {
         SetFilePointer(hDump, 0, NULL, FILE_BEGIN);
 
         unsigned int offset = 0;
-        
         // place MZ header + null dword
         *(DWORD*) (packedFile) = MZ_HEADER;
         // place NT_header
         memcpy((packedFile + sizeof(DWORD)), &(parser->NT_HEADERS64), sizeof(___IMAGE_NT_HEADERS64));
-
         offset = sizeof(DWORD) + sizeof(___IMAGE_NT_HEADERS64);
 
         i = 0;

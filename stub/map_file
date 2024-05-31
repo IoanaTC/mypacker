@@ -1,24 +1,22 @@
  stub
 
- Timestamp is 665849ed (Thu May 30 12:42:05 2024)
+ Timestamp is 6659c238 (Fri May 31 15:27:36 2024)
 
  Preferred load address is 0000000180000000
 
  Start         Length     Name                   Class
- 0001:00000000 00000078H .text$mn                CODE
+ 0001:00000000 00000219H .text$mn                CODE
  0002:00000000 0000000cH .pdata                  DATA
- 0003:00000000 00000020H .idata$5                DATA
- 0003:00000020 00000014H .idata$2                DATA
- 0003:00000034 00000014H .idata$3                DATA
- 0003:00000048 00000020H .idata$4                DATA
- 0003:00000068 0000003cH .idata$6                DATA
- 0004:00000000 00000010H .A$A                    DATA
- 0004:00000010 00000008H .bss                    DATA
- 0004:00000018 0000002cH .rdata                  DATA
- 0004:00000044 00000020H .rdata$voltmd           DATA
- 0004:00000064 000000fcH .rdata$zzzdbg           DATA
- 0004:00000160 00000008H .xdata                  DATA
- 0004:00000168 00000000H .edata                  DATA
+ 0003:00000000 00000038H .idata$5                DATA
+ 0003:00000038 0000006cH .rdata                  DATA
+ 0003:000000a4 00000020H .rdata$voltmd           DATA
+ 0003:000000c4 000000dcH .rdata$zzzdbg           DATA
+ 0003:000001a0 00000008H .xdata                  DATA
+ 0003:000001a8 00000000H .edata                  DATA
+ 0003:000001a8 00000014H .idata$2                DATA
+ 0003:000001bc 00000014H .idata$3                DATA
+ 0003:000001d0 00000038H .idata$4                DATA
+ 0003:00000208 0000006cH .idata$6                DATA
 
   Address         Publics by Value              Rva+Base               Lib:Object
 
@@ -51,21 +49,27 @@
  0000:00000000       __hybrid_image_info_bitfield 0000000000000000     <absolute>
  0000:00000000       __x64_code_ranges_to_entry_points 0000000000000000     <absolute>
  0000:00000000       __x64_code_ranges_to_entry_points_count 0000000000000000     <absolute>
- 0001:00000000       ?StubEntryPoint@@YAXXZ     0000000180000260 f   stub.obj
- 0003:00000000       __imp_WriteFile            00000001800002f0     kernel32:KERNEL32.dll
- 0003:00000008       __imp_GetModuleHandleA     00000001800002f8     kernel32:KERNEL32.dll
- 0003:00000010       __imp_CreateFileA          0000000180000300     kernel32:KERNEL32.dll
- 0003:00000018       \177KERNEL32_NULL_THUNK_DATA 0000000180000308     kernel32:KERNEL32.dll
- 0003:00000020       __IMPORT_DESCRIPTOR_KERNEL32 0000000180000310     kernel32:KERNEL32.dll
- 0003:00000034       __NULL_IMPORT_DESCRIPTOR   0000000180000324     kernel32:KERNEL32.dll
- 0004:00000000       ?genv@@3UGlobalExternVariables@@A 00000001800003a0     stub.obj
- 0004:00000010       ?load_address@@3_KA        00000001800003b0     stub.obj
- 0004:00000044       __volatile_metadata        00000001800003e4     <linker-defined>
+ 0001:00000000       ?StubEntryPoint@@YAXXZ     0000000180000240 f   stub.obj
+ 0003:00000000       __imp_WriteFile            0000000180000470     kernel32:KERNEL32.dll
+ 0003:00000008       __imp_CloseHandle          0000000180000478     kernel32:KERNEL32.dll
+ 0003:00000010       __imp_GetModuleHandleA     0000000180000480     kernel32:KERNEL32.dll
+ 0003:00000018       __imp_GetProcAddress       0000000180000488     kernel32:KERNEL32.dll
+ 0003:00000020       __imp_LoadLibraryA         0000000180000490     kernel32:KERNEL32.dll
+ 0003:00000028       __imp_CreateFileA          0000000180000498     kernel32:KERNEL32.dll
+ 0003:00000030       \177KERNEL32_NULL_THUNK_DATA 00000001800004a0     kernel32:KERNEL32.dll
+ 0003:000000a4       __volatile_metadata        0000000180000514     <linker-defined>
+ 0003:000001a8       __IMPORT_DESCRIPTOR_KERNEL32 0000000180000618     kernel32:KERNEL32.dll
+ 0003:000001bc       __NULL_IMPORT_DESCRIPTOR   000000018000062c     kernel32:KERNEL32.dll
 
  entry point at        0001:00000000
 
  Static symbols
 
- 0003:00000096       .idata$6                   0000000180000386     kernel32:KERNEL32.dll
- 0004:00000018       $SG93173                   00000001800003b8     stub.obj
- 0004:00000160       $unwind$?StubEntryPoint@@YAXXZ 0000000180000500     stub.obj
+ 0003:00000038       $SG93184                   00000001800004a8     stub.obj
+ 0003:00000048       $SG93185                   00000001800004b8     stub.obj
+ 0003:00000054       $SG93186                   00000001800004c4     stub.obj
+ 0003:0000005c       $SG93187                   00000001800004cc     stub.obj
+ 0003:00000068       $SG93189                   00000001800004d8     stub.obj
+ 0003:00000078       $SG93190                   00000001800004e8     stub.obj
+ 0003:000001a0       $unwind$?StubEntryPoint@@YAXXZ 0000000180000610     stub.obj
+ 0003:00000266       .idata$6                   00000001800006d6     kernel32:KERNEL32.dll

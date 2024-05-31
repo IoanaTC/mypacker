@@ -9,6 +9,7 @@
 typedef struct _COMPRESSED {
     char* content;
     long unsigned int size;
+    long unsigned int original_size;
 } COMPRESSED;
 
 
