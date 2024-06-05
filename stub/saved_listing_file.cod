@@ -5,303 +5,1707 @@ include listing.inc
 INCLUDELIB LIBCMT
 INCLUDELIB OLDNAMES
 
+PUBLIC	?genv@@3UGlobalExternVariables@@A		; genv
 CONST	SEGMENT
-$SG93184 DB	'brieflz.dll', 00H
-	ORG $+4
-$SG93185 DB	'msvcrt.dll', 00H
+$SG96943 DB	'log.txt', 00H
+$SG96944 DB	'brieflz.dll', 00H
+$SG96966 DB	0aH, 00H
+	ORG $+2
+$SG96945 DB	'msvcrt.dll', 00H
 	ORG $+1
-$SG93186 DB	'malloc', 00H
+$SG96948 DB	'malloc', 00H
 	ORG $+1
-$SG93187 DB	'memcpy', 00H
+$SG96949 DB	'memcpy', 00H
+	ORG $+1
+$SG96950 DB	'memset', 00H
 	ORG $+5
-$SG93189 DB	'blz_depack_safe', 00H
-$SG93190 DB	'dump_by_stub', 00H
+$SG96951 DB	'blz_depack_safe', 00H
+$SG96952 DB	'strlen', 00H
+	ORG $+1
+$SG96958 DB	'dump_by_stub1.exe', 00H
+	ORG $+2
+$SG96962 DB	0aH, 0aH, 00H
+	ORG $+1
+$SG96981 DB	0aH, 0aH, 0aH, 0aH, 00H
+	ORG $+3
+$SG96982 DB	0aH, 00H
+	ORG $+2
+$SG96984 DB	0aH, 0aH, 00H
+	ORG $+1
+$SG96987 DB	'dump_by_stub.exe', 00H
 CONST	ENDS
+A$A	SEGMENT
+?genv@@3UGlobalExternVariables@@A	ORG $+8		; genv
+A$A	ENDS
+PUBLIC	?GetDLLLoadAddress@@YA_KXZ			; GetDLLLoadAddress
 PUBLIC	?StubEntryPoint@@YAXXZ				; StubEntryPoint
 EXTRN	__imp_CreateFileA:PROC
 EXTRN	__imp_WriteFile:PROC
-EXTRN	__imp_CloseHandle:PROC
+EXTRN	__imp_Sleep:PROC
+EXTRN	__imp_VirtualAlloc:PROC
+EXTRN	__imp_VirtualProtect:PROC
 EXTRN	__imp_GetModuleHandleA:PROC
+EXTRN	__imp_GetModuleHandleExA:PROC
 EXTRN	__imp_GetProcAddress:PROC
 EXTRN	__imp_LoadLibraryA:PROC
 pdata	SEGMENT
-$pdata$?StubEntryPoint@@YAXXZ DD imagerel $LN4
-	DD	imagerel $LN4+537
+$pdata$?GetDLLLoadAddress@@YA_KXZ DD imagerel $LN4
+	DD	imagerel $LN4+45
+	DD	imagerel $unwind$?GetDLLLoadAddress@@YA_KXZ
+$pdata$?StubEntryPoint@@YAXXZ DD imagerel $LN56
+	DD	imagerel $LN56+3510
 	DD	imagerel $unwind$?StubEntryPoint@@YAXXZ
 pdata	ENDS
 xdata	SEGMENT
+$unwind$?GetDLLLoadAddress@@YA_KXZ DD 010401H
+	DD	06204H
 $unwind$?StubEntryPoint@@YAXXZ DD 020701H
-	DD	01b0107H
+	DD	03f0107H
 xdata	ENDS
 ; Function compile flags: /Odtp
 ; File D:\licenta\mypacker\stub\stub.cpp
 _TEXT	SEGMENT
-off$ = 64
-origS$ = 68
-load_address$ = 72
-nSec$ = 80
-bytes$ = 84
-pSec$ = 88
-VS$ = 96
-msvcrtDLL$ = 104
-pNt$ = 112
-malloc$ = 120
-com$ = 128
-dec$ = 136
-dump$ = 144
-size$ = 152
-VA$ = 160
-memcpy$ = 168
-brieflzDLL$ = 176
-blz_depack_safe$ = 184
-BA$ = 192
+bytes$ = 64
+lpOrigLoadAddress$ = 72
+offset$1 = 80
+i$2 = 84
+pNt$ = 88
+hLog$ = 96
+boundDescriptor$ = 104
+type$3 = 112
+i$4 = 116
+i$5 = 120
+relocation$ = 128
+importDescriptor$ = 136
+pSec$ = 144
+pINT$6 = 152
+delayloadDescriptor$ = 160
+functionEntries$ = 168
+delayedINT$7 = 176
+relocationBase$8 = 184
+relocationEntry$9 = 192
+msvcrtDLL$ = 200
+load_address$ = 208
+functionID$ = 216
+delayedFunction$10 = 224
+delayedIAT$11 = 232
+stub_load_address$ = 240
+dllName$ = 248
+forwarderRef$12 = 256
+size$ = 264
+numEntries$ = 268
+functionAddress$ = 272
+pIAT$13 = 280
+hDelayModule$14 = 288
+exceptionDirectory$ = 296
+delta$ = 304
+brieflzDLL$ = 312
+blz_depack_safe$ = 320
+importDirectory$ = 328
+hModuleDLL$15 = 336
+boundDirectory$ = 344
+delayedDirectory$ = 352
+relocationDirectory$ = 360
+numEntries$16 = 368
+oldProtect$ = 376
+malloc$ = 384
+memcpy$ = 392
+hDump1$ = 400
+strlen$ = 408
+dllName$17 = 416
+hModule$18 = 424
+forwarderDLLName$19 = 432
+hForwarderModule$20 = 440
+dllName$21 = 448
+hDump$ = 456
+entryPoint$ = 464
+memset$ = 472
+pLoadConfig_main$ = 480
 ?StubEntryPoint@@YAXXZ PROC				; StubEntryPoint
 
-; 22   : void __declspec(noinline) StubEntryPoint() {
+; 28   : void __declspec(noinline) StubEntryPoint() {
 
-$LN4:
-  00000	48 81 ec d8 00
-	00 00		 sub	 rsp, 216		; 000000d8H
+$LN56:
+  00000	48 81 ec f8 01
+	00 00		 sub	 rsp, 504		; 000001f8H
 
-; 23   : 
-; 24   :     HMODULE brieflzDLL = LoadLibrary("brieflz.dll");
+; 29   : 
+; 30   :     HANDLE hLog = CreateFile("log.txt", FILE_APPEND_DATA, FILE_SHARE_WRITE, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
 
-  00007	48 8d 0d 00 00
-	00 00		 lea	 rcx, OFFSET FLAT:$SG93184
-  0000e	ff 15 00 00 00
-	00		 call	 QWORD PTR __imp_LoadLibraryA
-  00014	48 89 84 24 b0
-	00 00 00	 mov	 QWORD PTR brieflzDLL$[rsp], rax
-
-; 25   :     HMODULE msvcrtDLL = LoadLibrary("msvcrt.dll");
-
-  0001c	48 8d 0d 00 00
-	00 00		 lea	 rcx, OFFSET FLAT:$SG93185
-  00023	ff 15 00 00 00
-	00		 call	 QWORD PTR __imp_LoadLibraryA
-  00029	48 89 44 24 68	 mov	 QWORD PTR msvcrtDLL$[rsp], rax
-
-; 26   : 
-; 27   :     typedef void* (*MallocFunction)(size_t);
-; 28   :     MallocFunction malloc = (MallocFunction) GetProcAddress(msvcrtDLL, "malloc");
-
-  0002e	48 8d 15 00 00
-	00 00		 lea	 rdx, OFFSET FLAT:$SG93186
-  00035	48 8b 4c 24 68	 mov	 rcx, QWORD PTR msvcrtDLL$[rsp]
-  0003a	ff 15 00 00 00
-	00		 call	 QWORD PTR __imp_GetProcAddress
-  00040	48 89 44 24 78	 mov	 QWORD PTR malloc$[rsp], rax
-
-; 29   :     typedef void* (__cdecl *MemcpyFunction)(void*, const void*, size_t);
-; 30   :     MemcpyFunction memcpy = (MemcpyFunction) GetProcAddress(msvcrtDLL, "memcpy");
-
-  00045	48 8d 15 00 00
-	00 00		 lea	 rdx, OFFSET FLAT:$SG93187
-  0004c	48 8b 4c 24 68	 mov	 rcx, QWORD PTR msvcrtDLL$[rsp]
-  00051	ff 15 00 00 00
-	00		 call	 QWORD PTR __imp_GetProcAddress
-  00057	48 89 84 24 a8
-	00 00 00	 mov	 QWORD PTR memcpy$[rsp], rax
-
-; 31   : 
-; 32   :     // get the parent executable base address
-; 33   :     HMODULE load_address = GetModuleHandle(NULL);
-
-  0005f	33 c9		 xor	 ecx, ecx
-  00061	ff 15 00 00 00
-	00		 call	 QWORD PTR __imp_GetModuleHandleA
-  00067	48 89 44 24 48	 mov	 QWORD PTR load_address$[rsp], rax
-
-; 34   :     if(!load_address) {
-
-  0006c	48 83 7c 24 48
-	00		 cmp	 QWORD PTR load_address$[rsp], 0
-  00072	75 05		 jne	 SHORT $LN2@StubEntryP
-
-; 35   :         return;
-
-  00074	e9 98 01 00 00	 jmp	 $LN1@StubEntryP
-$LN2@StubEntryP:
-
-; 36   :     }
-; 37   : 
-; 38   :     // get to the section header
-; 39   :     unsigned int off = sizeof(DWORD);
-
-  00079	c7 44 24 40 04
-	00 00 00	 mov	 DWORD PTR off$[rsp], 4
-
-; 40   :     PIMAGE_NT_HEADERS64 pNt = (PIMAGE_NT_HEADERS64)((BYTE*)load_address + off);
-
-  00081	8b 44 24 40	 mov	 eax, DWORD PTR off$[rsp]
-  00085	48 8b 4c 24 48	 mov	 rcx, QWORD PTR load_address$[rsp]
-  0008a	48 03 c8	 add	 rcx, rax
-  0008d	48 8b c1	 mov	 rax, rcx
-  00090	48 89 44 24 70	 mov	 QWORD PTR pNt$[rsp], rax
-
-; 41   :     unsigned long long BA = pNt->OptionalHeader.ImageBase;
-
-  00095	48 8b 44 24 70	 mov	 rax, QWORD PTR pNt$[rsp]
-  0009a	48 8b 40 30	 mov	 rax, QWORD PTR [rax+48]
-  0009e	48 89 84 24 c0
-	00 00 00	 mov	 QWORD PTR BA$[rsp], rax
-
-; 42   : 
-; 43   :     DWORD nSec = pNt->FileHeader.NumberOfSections;
-
-  000a6	48 8b 44 24 70	 mov	 rax, QWORD PTR pNt$[rsp]
-  000ab	0f b7 40 06	 movzx	 eax, WORD PTR [rax+6]
-  000af	89 44 24 50	 mov	 DWORD PTR nSec$[rsp], eax
-
-; 44   :     off += sizeof(IMAGE_NT_HEADERS64) + nSec * sizeof(IMAGE_SECTION_HEADER);
-
-  000b3	8b 44 24 50	 mov	 eax, DWORD PTR nSec$[rsp]
-  000b7	48 6b c0 28	 imul	 rax, rax, 40		; 00000028H
-  000bb	8b 4c 24 40	 mov	 ecx, DWORD PTR off$[rsp]
-  000bf	48 8d 84 01 08
-	01 00 00	 lea	 rax, QWORD PTR [rcx+rax+264]
-  000c7	89 44 24 40	 mov	 DWORD PTR off$[rsp], eax
-
-; 45   : 
-; 46   :     PIMAGE_SECTION_HEADER pSec = (PIMAGE_SECTION_HEADER)((BYTE*) load_address + off);
-
-  000cb	8b 44 24 40	 mov	 eax, DWORD PTR off$[rsp]
-  000cf	48 8b 4c 24 48	 mov	 rcx, QWORD PTR load_address$[rsp]
-  000d4	48 03 c8	 add	 rcx, rax
-  000d7	48 8b c1	 mov	 rax, rcx
-  000da	48 89 44 24 58	 mov	 QWORD PTR pSec$[rsp], rax
-
-; 47   :     unsigned long long VS = pSec->SizeOfRawData;
-
-  000df	48 8b 44 24 58	 mov	 rax, QWORD PTR pSec$[rsp]
-  000e4	8b 40 10	 mov	 eax, DWORD PTR [rax+16]
-  000e7	48 89 44 24 60	 mov	 QWORD PTR VS$[rsp], rax
-
-; 48   :     unsigned long long VA = pSec->PointerToRawData;
-
-  000ec	48 8b 44 24 58	 mov	 rax, QWORD PTR pSec$[rsp]
-  000f1	8b 40 14	 mov	 eax, DWORD PTR [rax+20]
-  000f4	48 89 84 24 a0
-	00 00 00	 mov	 QWORD PTR VA$[rsp], rax
-
-; 49   : 
-; 50   :     // get data into a buffer and decompress using brieflz
-; 51   :     unsigned long origS = pSec->PointerToRelocations;
-
-  000fc	48 8b 44 24 58	 mov	 rax, QWORD PTR pSec$[rsp]
-  00101	8b 40 18	 mov	 eax, DWORD PTR [rax+24]
-  00104	89 44 24 44	 mov	 DWORD PTR origS$[rsp], eax
-
-; 52   : 
-; 53   :     BYTE* dec = (BYTE*) malloc(origS * sizeof(BYTE));
-
-  00108	8b 44 24 44	 mov	 eax, DWORD PTR origS$[rsp]
-  0010c	8b c8		 mov	 ecx, eax
-  0010e	ff 54 24 78	 call	 QWORD PTR malloc$[rsp]
-  00112	48 89 84 24 88
-	00 00 00	 mov	 QWORD PTR dec$[rsp], rax
-
-; 54   :     BYTE* com = (BYTE*) malloc(VS * sizeof(BYTE));
-
-  0011a	48 8b 4c 24 60	 mov	 rcx, QWORD PTR VS$[rsp]
-  0011f	ff 54 24 78	 call	 QWORD PTR malloc$[rsp]
-  00123	48 89 84 24 80
-	00 00 00	 mov	 QWORD PTR com$[rsp], rax
-
-; 55   :     memcpy(com, ((BYTE*) load_address + VA), VS);
-
-  0012b	48 8b 84 24 a0
-	00 00 00	 mov	 rax, QWORD PTR VA$[rsp]
-  00133	48 8b 4c 24 48	 mov	 rcx, QWORD PTR load_address$[rsp]
-  00138	48 03 c8	 add	 rcx, rax
-  0013b	48 8b c1	 mov	 rax, rcx
-  0013e	4c 8b 44 24 60	 mov	 r8, QWORD PTR VS$[rsp]
-  00143	48 8b d0	 mov	 rdx, rax
-  00146	48 8b 8c 24 80
-	00 00 00	 mov	 rcx, QWORD PTR com$[rsp]
-  0014e	ff 94 24 a8 00
-	00 00		 call	 QWORD PTR memcpy$[rsp]
-
-; 56   : 
-; 57   :     //typedef unsigned long (*BLZ_DEPACK_FUNCTION)(const void *src, void *dst, unsigned long depacked_size);
-; 58   :     typedef unsigned long (*BLZ_DEPACK_FUNCTION)(const void *src, unsigned long src_size, void *dst, unsigned long depacked_size);
-; 59   :     BLZ_DEPACK_FUNCTION blz_depack_safe = (BLZ_DEPACK_FUNCTION)GetProcAddress(brieflzDLL, "blz_depack_safe");
-
-  00155	48 8d 15 00 00
-	00 00		 lea	 rdx, OFFSET FLAT:$SG93189
-  0015c	48 8b 8c 24 b0
-	00 00 00	 mov	 rcx, QWORD PTR brieflzDLL$[rsp]
-  00164	ff 15 00 00 00
-	00		 call	 QWORD PTR __imp_GetProcAddress
-  0016a	48 89 84 24 b8
-	00 00 00	 mov	 QWORD PTR blz_depack_safe$[rsp], rax
-
-; 60   :     //BLZ_DEPACK_FUNCTION blz_depack = (BLZ_DEPACK_FUNCTION)GetProcAddress(brieflzDLL, "blz_depack");
-; 61   : 
-; 62   :     unsigned long size = blz_depack_safe(com, VS, dec, origS);
-
-  00172	44 8b 4c 24 44	 mov	 r9d, DWORD PTR origS$[rsp]
-  00177	4c 8b 84 24 88
-	00 00 00	 mov	 r8, QWORD PTR dec$[rsp]
-  0017f	8b 54 24 60	 mov	 edx, DWORD PTR VS$[rsp]
-  00183	48 8b 8c 24 80
-	00 00 00	 mov	 rcx, QWORD PTR com$[rsp]
-  0018b	ff 94 24 b8 00
-	00 00		 call	 QWORD PTR blz_depack_safe$[rsp]
-  00192	89 84 24 98 00
-	00 00		 mov	 DWORD PTR size$[rsp], eax
-
-; 63   :     //unsigned long size = blz_depack(com, dec, origS);
-; 64   : 
-; 65   :     HANDLE dump = CreateFile("dump_by_stub", GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
-
-  00199	48 c7 44 24 30
+  00007	48 c7 44 24 30
 	00 00 00 00	 mov	 QWORD PTR [rsp+48], 0
-  001a2	c7 44 24 28 80
+  00010	c7 44 24 28 80
 	00 00 00	 mov	 DWORD PTR [rsp+40], 128	; 00000080H
-  001aa	c7 44 24 20 02
+  00018	c7 44 24 20 02
 	00 00 00	 mov	 DWORD PTR [rsp+32], 2
-  001b2	45 33 c9	 xor	 r9d, r9d
-  001b5	45 33 c0	 xor	 r8d, r8d
-  001b8	ba 00 00 00 40	 mov	 edx, 1073741824		; 40000000H
-  001bd	48 8d 0d 00 00
-	00 00		 lea	 rcx, OFFSET FLAT:$SG93190
-  001c4	ff 15 00 00 00
+  00020	45 33 c9	 xor	 r9d, r9d
+  00023	41 b8 02 00 00
+	00		 mov	 r8d, 2
+  00029	ba 04 00 00 00	 mov	 edx, 4
+  0002e	48 8d 0d 00 00
+	00 00		 lea	 rcx, OFFSET FLAT:$SG96943
+  00035	ff 15 00 00 00
 	00		 call	 QWORD PTR __imp_CreateFileA
-  001ca	48 89 84 24 90
-	00 00 00	 mov	 QWORD PTR dump$[rsp], rax
+  0003b	48 89 44 24 60	 mov	 QWORD PTR hLog$[rsp], rax
 
-; 66   :     long unsigned int bytes = 0;
+; 31   :     long unsigned int bytes = 0;
 
-  001d2	c7 44 24 54 00
+  00040	c7 44 24 40 00
 	00 00 00	 mov	 DWORD PTR bytes$[rsp], 0
 
-; 67   :     WriteFile(dump, dec, origS, &bytes, NULL);
+; 32   :     unsigned long long stub_load_address = GetDLLLoadAddress();
 
-  001da	48 c7 44 24 20
+  00048	e8 00 00 00 00	 call	 ?GetDLLLoadAddress@@YA_KXZ ; GetDLLLoadAddress
+  0004d	48 89 84 24 f0
+	00 00 00	 mov	 QWORD PTR stub_load_address$[rsp], rax
+
+; 33   :     WriteFile(hLog, &stub_load_address, 8, &bytes, NULL);
+
+  00055	48 c7 44 24 20
 	00 00 00 00	 mov	 QWORD PTR [rsp+32], 0
-  001e3	4c 8d 4c 24 54	 lea	 r9, QWORD PTR bytes$[rsp]
-  001e8	44 8b 44 24 44	 mov	 r8d, DWORD PTR origS$[rsp]
-  001ed	48 8b 94 24 88
-	00 00 00	 mov	 rdx, QWORD PTR dec$[rsp]
-  001f5	48 8b 8c 24 90
-	00 00 00	 mov	 rcx, QWORD PTR dump$[rsp]
-  001fd	ff 15 00 00 00
+  0005e	4c 8d 4c 24 40	 lea	 r9, QWORD PTR bytes$[rsp]
+  00063	41 b8 08 00 00
+	00		 mov	 r8d, 8
+  00069	48 8d 94 24 f0
+	00 00 00	 lea	 rdx, QWORD PTR stub_load_address$[rsp]
+  00071	48 8b 4c 24 60	 mov	 rcx, QWORD PTR hLog$[rsp]
+  00076	ff 15 00 00 00
 	00		 call	 QWORD PTR __imp_WriteFile
 
-; 68   :     CloseHandle(dump);
+; 34   : 
+; 35   :     HMODULE brieflzDLL = LoadLibraryA("brieflz.dll");
 
-  00203	48 8b 8c 24 90
-	00 00 00	 mov	 rcx, QWORD PTR dump$[rsp]
-  0020b	ff 15 00 00 00
-	00		 call	 QWORD PTR __imp_CloseHandle
+  0007c	48 8d 0d 00 00
+	00 00		 lea	 rcx, OFFSET FLAT:$SG96944
+  00083	ff 15 00 00 00
+	00		 call	 QWORD PTR __imp_LoadLibraryA
+  00089	48 89 84 24 38
+	01 00 00	 mov	 QWORD PTR brieflzDLL$[rsp], rax
+
+; 36   :     HMODULE msvcrtDLL = LoadLibraryA("msvcrt.dll");
+
+  00091	48 8d 0d 00 00
+	00 00		 lea	 rcx, OFFSET FLAT:$SG96945
+  00098	ff 15 00 00 00
+	00		 call	 QWORD PTR __imp_LoadLibraryA
+  0009e	48 89 84 24 c8
+	00 00 00	 mov	 QWORD PTR msvcrtDLL$[rsp], rax
+
+; 37   : 
+; 38   :     if (!brieflzDLL || !msvcrtDLL) {
+
+  000a6	48 83 bc 24 38
+	01 00 00 00	 cmp	 QWORD PTR brieflzDLL$[rsp], 0
+  000af	74 0b		 je	 SHORT $LN24@StubEntryP
+  000b1	48 83 bc 24 c8
+	00 00 00 00	 cmp	 QWORD PTR msvcrtDLL$[rsp], 0
+  000ba	75 05		 jne	 SHORT $LN23@StubEntryP
+$LN24@StubEntryP:
+
+; 39   :         return;
+
+  000bc	e9 ed 0c 00 00	 jmp	 $LN1@StubEntryP
+$LN23@StubEntryP:
+
+; 40   :     }
+; 41   : 
+; 42   :     typedef void* (*MallocFunction)(size_t);
+; 43   :     MallocFunction malloc = (MallocFunction)GetProcAddress(msvcrtDLL, "malloc");
+
+  000c1	48 8d 15 00 00
+	00 00		 lea	 rdx, OFFSET FLAT:$SG96948
+  000c8	48 8b 8c 24 c8
+	00 00 00	 mov	 rcx, QWORD PTR msvcrtDLL$[rsp]
+  000d0	ff 15 00 00 00
+	00		 call	 QWORD PTR __imp_GetProcAddress
+  000d6	48 89 84 24 80
+	01 00 00	 mov	 QWORD PTR malloc$[rsp], rax
+
+; 44   :     typedef void* (__cdecl *MemcpyFunction)(void*, const void*, size_t);
+; 45   :     MemcpyFunction memcpy = (MemcpyFunction)GetProcAddress(msvcrtDLL, "memcpy");
+
+  000de	48 8d 15 00 00
+	00 00		 lea	 rdx, OFFSET FLAT:$SG96949
+  000e5	48 8b 8c 24 c8
+	00 00 00	 mov	 rcx, QWORD PTR msvcrtDLL$[rsp]
+  000ed	ff 15 00 00 00
+	00		 call	 QWORD PTR __imp_GetProcAddress
+  000f3	48 89 84 24 88
+	01 00 00	 mov	 QWORD PTR memcpy$[rsp], rax
+
+; 46   :     typedef void* (__cdecl *MemsetFunction)(void*, int, size_t);
+; 47   :     MemsetFunction memset = (MemsetFunction)GetProcAddress(msvcrtDLL, "memset");
+
+  000fb	48 8d 15 00 00
+	00 00		 lea	 rdx, OFFSET FLAT:$SG96950
+  00102	48 8b 8c 24 c8
+	00 00 00	 mov	 rcx, QWORD PTR msvcrtDLL$[rsp]
+  0010a	ff 15 00 00 00
+	00		 call	 QWORD PTR __imp_GetProcAddress
+  00110	48 89 84 24 d8
+	01 00 00	 mov	 QWORD PTR memset$[rsp], rax
+
+; 48   :     typedef unsigned long (*BLZ_DEPACK_FUNCTION)(const void* src, unsigned long src_size, void* dst, unsigned long depacked_size);
+; 49   :     BLZ_DEPACK_FUNCTION blz_depack_safe = (BLZ_DEPACK_FUNCTION)GetProcAddress(brieflzDLL, "blz_depack_safe");
+
+  00118	48 8d 15 00 00
+	00 00		 lea	 rdx, OFFSET FLAT:$SG96951
+  0011f	48 8b 8c 24 38
+	01 00 00	 mov	 rcx, QWORD PTR brieflzDLL$[rsp]
+  00127	ff 15 00 00 00
+	00		 call	 QWORD PTR __imp_GetProcAddress
+  0012d	48 89 84 24 40
+	01 00 00	 mov	 QWORD PTR blz_depack_safe$[rsp], rax
+
+; 50   :     typedef unsigned long (*strlenFunction)(const void* buffer);
+; 51   :     strlenFunction strlen = (strlenFunction)GetProcAddress(msvcrtDLL, "strlen");
+
+  00135	48 8d 15 00 00
+	00 00		 lea	 rdx, OFFSET FLAT:$SG96952
+  0013c	48 8b 8c 24 c8
+	00 00 00	 mov	 rcx, QWORD PTR msvcrtDLL$[rsp]
+  00144	ff 15 00 00 00
+	00		 call	 QWORD PTR __imp_GetProcAddress
+  0014a	48 89 84 24 98
+	01 00 00	 mov	 QWORD PTR strlen$[rsp], rax
+
+; 52   : 
+; 53   :     if(!malloc || !memcpy || !blz_depack_safe) {
+
+  00152	48 83 bc 24 80
+	01 00 00 00	 cmp	 QWORD PTR malloc$[rsp], 0
+  0015b	74 16		 je	 SHORT $LN26@StubEntryP
+  0015d	48 83 bc 24 88
+	01 00 00 00	 cmp	 QWORD PTR memcpy$[rsp], 0
+  00166	74 0b		 je	 SHORT $LN26@StubEntryP
+  00168	48 83 bc 24 40
+	01 00 00 00	 cmp	 QWORD PTR blz_depack_safe$[rsp], 0
+  00171	75 05		 jne	 SHORT $LN25@StubEntryP
+$LN26@StubEntryP:
+
+; 54   :         return;
+
+  00173	e9 36 0c 00 00	 jmp	 $LN1@StubEntryP
+$LN25@StubEntryP:
+
+; 55   :     }
+; 56   : 
+; 57   :     HMODULE load_address = GetModuleHandle(NULL);
+
+  00178	33 c9		 xor	 ecx, ecx
+  0017a	ff 15 00 00 00
+	00		 call	 QWORD PTR __imp_GetModuleHandleA
+  00180	48 89 84 24 d0
+	00 00 00	 mov	 QWORD PTR load_address$[rsp], rax
+
+; 58   :     if (!load_address) {
+
+  00188	48 83 bc 24 d0
+	00 00 00 00	 cmp	 QWORD PTR load_address$[rsp], 0
+  00191	75 05		 jne	 SHORT $LN27@StubEntryP
+
+; 59   :         return;
+
+  00193	e9 16 0c 00 00	 jmp	 $LN1@StubEntryP
+$LN27@StubEntryP:
+
+; 60   :     }
+; 61   :     PIMAGE_NT_HEADERS64 pNt = (PIMAGE_NT_HEADERS64)((BYTE*)load_address + sizeof(DWORD));
+
+  00198	48 8b 84 24 d0
+	00 00 00	 mov	 rax, QWORD PTR load_address$[rsp]
+  001a0	48 83 c0 04	 add	 rax, 4
+  001a4	48 89 44 24 58	 mov	 QWORD PTR pNt$[rsp], rax
+
+; 62   :     PIMAGE_SECTION_HEADER pSec = (PIMAGE_SECTION_HEADER)((BYTE*)load_address + sizeof(DWORD) +
+
+  001a9	48 8b 44 24 58	 mov	 rax, QWORD PTR pNt$[rsp]
+  001ae	0f b7 40 06	 movzx	 eax, WORD PTR [rax+6]
+  001b2	48 6b c0 28	 imul	 rax, rax, 40		; 00000028H
+  001b6	48 8b 8c 24 d0
+	00 00 00	 mov	 rcx, QWORD PTR load_address$[rsp]
+  001be	48 8d 84 01 0c
+	01 00 00	 lea	 rax, QWORD PTR [rcx+rax+268]
+  001c6	48 89 84 24 90
+	00 00 00	 mov	 QWORD PTR pSec$[rsp], rax
+
+; 63   :             sizeof(IMAGE_NT_HEADERS64) + pNt->FileHeader.NumberOfSections * sizeof(IMAGE_SECTION_HEADER));
+; 64   :     PIMAGE_LOAD_CONFIG_DIRECTORY pLoadConfig_main = (PIMAGE_LOAD_CONFIG_DIRECTORY)((BYTE*)load_address + pNt->OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_LOAD_CONFIG].VirtualAddress);
+
+  001ce	b8 08 00 00 00	 mov	 eax, 8
+  001d3	48 6b c0 0a	 imul	 rax, rax, 10
+  001d7	48 8b 4c 24 58	 mov	 rcx, QWORD PTR pNt$[rsp]
+  001dc	8b 84 01 88 00
+	00 00		 mov	 eax, DWORD PTR [rcx+rax+136]
+  001e3	48 8b 8c 24 d0
+	00 00 00	 mov	 rcx, QWORD PTR load_address$[rsp]
+  001eb	48 03 c8	 add	 rcx, rax
+  001ee	48 8b c1	 mov	 rax, rcx
+  001f1	48 89 84 24 e0
+	01 00 00	 mov	 QWORD PTR pLoadConfig_main$[rsp], rax
+
+; 65   : 
+; 66   :     LPVOID lpOrigLoadAddress = VirtualAlloc(NULL, pSec->PointerToRelocations, MEM_COMMIT | MEM_RESERVE, PAGE_EXECUTE_READWRITE);
+
+  001f9	48 8b 84 24 90
+	00 00 00	 mov	 rax, QWORD PTR pSec$[rsp]
+  00201	8b 40 18	 mov	 eax, DWORD PTR [rax+24]
+  00204	41 b9 40 00 00
+	00		 mov	 r9d, 64			; 00000040H
+  0020a	41 b8 00 30 00
+	00		 mov	 r8d, 12288		; 00003000H
+  00210	8b d0		 mov	 edx, eax
+  00212	33 c9		 xor	 ecx, ecx
+  00214	ff 15 00 00 00
+	00		 call	 QWORD PTR __imp_VirtualAlloc
+  0021a	48 89 44 24 48	 mov	 QWORD PTR lpOrigLoadAddress$[rsp], rax
+
+; 67   :     if (!lpOrigLoadAddress) {
+
+  0021f	48 83 7c 24 48
+	00		 cmp	 QWORD PTR lpOrigLoadAddress$[rsp], 0
+  00225	75 05		 jne	 SHORT $LN28@StubEntryP
+
+; 68   :         return;
+
+  00227	e9 82 0b 00 00	 jmp	 $LN1@StubEntryP
+$LN28@StubEntryP:
+
+; 69   :     }
+; 70   :     unsigned long size = blz_depack_safe(((BYTE*)load_address + pSec->PointerToRawData), pSec->SizeOfRawData, ((BYTE*)lpOrigLoadAddress), pSec->PointerToRelocations);
+
+  0022c	48 8b 84 24 90
+	00 00 00	 mov	 rax, QWORD PTR pSec$[rsp]
+  00234	8b 40 14	 mov	 eax, DWORD PTR [rax+20]
+  00237	48 8b 8c 24 d0
+	00 00 00	 mov	 rcx, QWORD PTR load_address$[rsp]
+  0023f	48 03 c8	 add	 rcx, rax
+  00242	48 8b c1	 mov	 rax, rcx
+  00245	48 8b 8c 24 90
+	00 00 00	 mov	 rcx, QWORD PTR pSec$[rsp]
+  0024d	44 8b 49 18	 mov	 r9d, DWORD PTR [rcx+24]
+  00251	4c 8b 44 24 48	 mov	 r8, QWORD PTR lpOrigLoadAddress$[rsp]
+  00256	48 8b 8c 24 90
+	00 00 00	 mov	 rcx, QWORD PTR pSec$[rsp]
+  0025e	8b 51 10	 mov	 edx, DWORD PTR [rcx+16]
+  00261	48 8b c8	 mov	 rcx, rax
+  00264	ff 94 24 40 01
+	00 00		 call	 QWORD PTR blz_depack_safe$[rsp]
+  0026b	89 84 24 08 01
+	00 00		 mov	 DWORD PTR size$[rsp], eax
+
+; 71   :     if (!size) {
+
+  00272	83 bc 24 08 01
+	00 00 00	 cmp	 DWORD PTR size$[rsp], 0
+  0027a	75 05		 jne	 SHORT $LN29@StubEntryP
+
+; 72   :         return;
+
+  0027c	e9 2d 0b 00 00	 jmp	 $LN1@StubEntryP
+$LN29@StubEntryP:
+
+; 73   :     }
+; 74   :     HANDLE hDump1 = CreateFile("dump_by_stub1.exe", GENERIC_WRITE, FILE_SHARE_WRITE, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+
+  00281	48 c7 44 24 30
+	00 00 00 00	 mov	 QWORD PTR [rsp+48], 0
+  0028a	c7 44 24 28 80
+	00 00 00	 mov	 DWORD PTR [rsp+40], 128	; 00000080H
+  00292	c7 44 24 20 02
+	00 00 00	 mov	 DWORD PTR [rsp+32], 2
+  0029a	45 33 c9	 xor	 r9d, r9d
+  0029d	41 b8 02 00 00
+	00		 mov	 r8d, 2
+  002a3	ba 00 00 00 40	 mov	 edx, 1073741824		; 40000000H
+  002a8	48 8d 0d 00 00
+	00 00		 lea	 rcx, OFFSET FLAT:$SG96958
+  002af	ff 15 00 00 00
+	00		 call	 QWORD PTR __imp_CreateFileA
+  002b5	48 89 84 24 90
+	01 00 00	 mov	 QWORD PTR hDump1$[rsp], rax
+
+; 75   :     WriteFile(hDump1, (BYTE*)lpOrigLoadAddress, pSec->PointerToRelocations, &bytes, NULL);
+
+  002bd	48 c7 44 24 20
+	00 00 00 00	 mov	 QWORD PTR [rsp+32], 0
+  002c6	4c 8d 4c 24 40	 lea	 r9, QWORD PTR bytes$[rsp]
+  002cb	48 8b 84 24 90
+	00 00 00	 mov	 rax, QWORD PTR pSec$[rsp]
+  002d3	44 8b 40 18	 mov	 r8d, DWORD PTR [rax+24]
+  002d7	48 8b 54 24 48	 mov	 rdx, QWORD PTR lpOrigLoadAddress$[rsp]
+  002dc	48 8b 8c 24 90
+	01 00 00	 mov	 rcx, QWORD PTR hDump1$[rsp]
+  002e4	ff 15 00 00 00
+	00		 call	 QWORD PTR __imp_WriteFile
+
+; 76   :     // move pNt to the NT_HEADERS of the original executable
+; 77   :     pNt = (PIMAGE_NT_HEADERS64)((BYTE*)lpOrigLoadAddress + ((PIMAGE_DOS_HEADER)lpOrigLoadAddress)->e_lfanew);
+
+  002ea	48 8b 44 24 48	 mov	 rax, QWORD PTR lpOrigLoadAddress$[rsp]
+  002ef	48 63 40 3c	 movsxd	 rax, DWORD PTR [rax+60]
+  002f3	48 8b 4c 24 48	 mov	 rcx, QWORD PTR lpOrigLoadAddress$[rsp]
+  002f8	48 03 c8	 add	 rcx, rax
+  002fb	48 8b c1	 mov	 rax, rcx
+  002fe	48 89 44 24 58	 mov	 QWORD PTR pNt$[rsp], rax
+
+; 78   :     // begin loader's job
+; 79   :     // fill IAT table
+; 80   :     LPCSTR functionID = NULL;
+
+  00303	48 c7 84 24 d8
+	00 00 00 00 00
+	00 00		 mov	 QWORD PTR functionID$[rsp], 0
+
+; 81   :     LPCSTR dllName = NULL;
+
+  0030f	48 c7 84 24 f8
+	00 00 00 00 00
+	00 00		 mov	 QWORD PTR dllName$[rsp], 0
+
+; 82   :     FARPROC functionAddress = NULL;
+
+  0031b	48 c7 84 24 10
+	01 00 00 00 00
+	00 00		 mov	 QWORD PTR functionAddress$[rsp], 0
+$_import$57:
+
+; 83   : _import:
+; 84   :     PIMAGE_DATA_DIRECTORY importDirectory = &pNt->OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_IMPORT];
+
+  00327	b8 08 00 00 00	 mov	 eax, 8
+  0032c	48 6b c0 01	 imul	 rax, rax, 1
+  00330	48 8b 4c 24 58	 mov	 rcx, QWORD PTR pNt$[rsp]
+  00335	48 8d 84 01 88
+	00 00 00	 lea	 rax, QWORD PTR [rcx+rax+136]
+  0033d	48 89 84 24 48
+	01 00 00	 mov	 QWORD PTR importDirectory$[rsp], rax
+
+; 85   :     if (!importDirectory->Size) {
+
+  00345	48 8b 84 24 48
+	01 00 00	 mov	 rax, QWORD PTR importDirectory$[rsp]
+  0034d	83 78 04 00	 cmp	 DWORD PTR [rax+4], 0
+  00351	75 0a		 jne	 SHORT $LN30@StubEntryP
+
+; 86   :         goto _bound;
+
+  00353	e9 62 02 00 00	 jmp	 $LN31@StubEntryP
+  00358	e9 5d 02 00 00	 jmp	 $_bound$58
+$LN30@StubEntryP:
+
+; 87   :     }
+; 88   :     // interate through import descriptors
+; 89   :     PIMAGE_IMPORT_DESCRIPTOR importDescriptor = (PIMAGE_IMPORT_DESCRIPTOR)((BYTE*)lpOrigLoadAddress + importDirectory->VirtualAddress);
+
+  0035d	48 8b 84 24 48
+	01 00 00	 mov	 rax, QWORD PTR importDirectory$[rsp]
+  00365	8b 00		 mov	 eax, DWORD PTR [rax]
+  00367	48 8b 4c 24 48	 mov	 rcx, QWORD PTR lpOrigLoadAddress$[rsp]
+  0036c	48 03 c8	 add	 rcx, rax
+  0036f	48 8b c1	 mov	 rax, rcx
+  00372	48 89 84 24 88
+	00 00 00	 mov	 QWORD PTR importDescriptor$[rsp], rax
+
+; 90   :     if (!importDescriptor) {
+
+  0037a	48 83 bc 24 88
+	00 00 00 00	 cmp	 QWORD PTR importDescriptor$[rsp], 0
+  00383	75 05		 jne	 SHORT $LN32@StubEntryP
+
+; 91   :         return;
+
+  00385	e9 24 0a 00 00	 jmp	 $LN1@StubEntryP
+$LN32@StubEntryP:
+$LN2@StubEntryP:
+
+; 92   :     }
+; 93   :     // solve each dll
+; 94   :     while (importDescriptor->OriginalFirstThunk) {
+
+  0038a	48 8b 84 24 88
+	00 00 00	 mov	 rax, QWORD PTR importDescriptor$[rsp]
+  00392	83 38 00	 cmp	 DWORD PTR [rax], 0
+  00395	0f 84 1f 02 00
+	00		 je	 $LN3@StubEntryP
+
+; 95   :         dllName = (LPCSTR)((BYTE*)lpOrigLoadAddress + importDescriptor->Name);
+
+  0039b	48 8b 84 24 88
+	00 00 00	 mov	 rax, QWORD PTR importDescriptor$[rsp]
+  003a3	8b 40 0c	 mov	 eax, DWORD PTR [rax+12]
+  003a6	48 8b 4c 24 48	 mov	 rcx, QWORD PTR lpOrigLoadAddress$[rsp]
+  003ab	48 03 c8	 add	 rcx, rax
+  003ae	48 8b c1	 mov	 rax, rcx
+  003b1	48 89 84 24 f8
+	00 00 00	 mov	 QWORD PTR dllName$[rsp], rax
+
+; 96   :         //debug
+; 97   :         WriteFile(hLog, dllName, strlen(dllName), &bytes, NULL);
+
+  003b9	48 8b 8c 24 f8
+	00 00 00	 mov	 rcx, QWORD PTR dllName$[rsp]
+  003c1	ff 94 24 98 01
+	00 00		 call	 QWORD PTR strlen$[rsp]
+  003c8	48 c7 44 24 20
+	00 00 00 00	 mov	 QWORD PTR [rsp+32], 0
+  003d1	4c 8d 4c 24 40	 lea	 r9, QWORD PTR bytes$[rsp]
+  003d6	44 8b c0	 mov	 r8d, eax
+  003d9	48 8b 94 24 f8
+	00 00 00	 mov	 rdx, QWORD PTR dllName$[rsp]
+  003e1	48 8b 4c 24 60	 mov	 rcx, QWORD PTR hLog$[rsp]
+  003e6	ff 15 00 00 00
+	00		 call	 QWORD PTR __imp_WriteFile
+
+; 98   :         WriteFile(hLog, "\n\n", 2, &bytes, NULL);
+
+  003ec	48 c7 44 24 20
+	00 00 00 00	 mov	 QWORD PTR [rsp+32], 0
+  003f5	4c 8d 4c 24 40	 lea	 r9, QWORD PTR bytes$[rsp]
+  003fa	41 b8 02 00 00
+	00		 mov	 r8d, 2
+  00400	48 8d 15 00 00
+	00 00		 lea	 rdx, OFFSET FLAT:$SG96962
+  00407	48 8b 4c 24 60	 mov	 rcx, QWORD PTR hLog$[rsp]
+  0040c	ff 15 00 00 00
+	00		 call	 QWORD PTR __imp_WriteFile
+
+; 99   :         //debug
+; 100  :         HMODULE hModuleDLL = LoadLibraryA(dllName);
+
+  00412	48 8b 8c 24 f8
+	00 00 00	 mov	 rcx, QWORD PTR dllName$[rsp]
+  0041a	ff 15 00 00 00
+	00		 call	 QWORD PTR __imp_LoadLibraryA
+  00420	48 89 84 24 50
+	01 00 00	 mov	 QWORD PTR hModuleDLL$15[rsp], rax
+
+; 101  :         if (!hModuleDLL) {
+
+  00428	48 83 bc 24 50
+	01 00 00 00	 cmp	 QWORD PTR hModuleDLL$15[rsp], 0
+  00431	75 05		 jne	 SHORT $LN33@StubEntryP
+
+; 102  :             return;
+
+  00433	e9 76 09 00 00	 jmp	 $LN1@StubEntryP
+$LN33@StubEntryP:
+
+; 103  :         }
+; 104  :         PIMAGE_THUNK_DATA pINT = (PIMAGE_THUNK_DATA)((BYTE*)lpOrigLoadAddress + importDescriptor->OriginalFirstThunk);
+
+  00438	48 8b 84 24 88
+	00 00 00	 mov	 rax, QWORD PTR importDescriptor$[rsp]
+  00440	8b 00		 mov	 eax, DWORD PTR [rax]
+  00442	48 8b 4c 24 48	 mov	 rcx, QWORD PTR lpOrigLoadAddress$[rsp]
+  00447	48 03 c8	 add	 rcx, rax
+  0044a	48 8b c1	 mov	 rax, rcx
+  0044d	48 89 84 24 98
+	00 00 00	 mov	 QWORD PTR pINT$6[rsp], rax
+
+; 105  :         PIMAGE_THUNK_DATA pIAT = (PIMAGE_THUNK_DATA)((BYTE*)lpOrigLoadAddress + importDescriptor->FirstThunk);
+
+  00455	48 8b 84 24 88
+	00 00 00	 mov	 rax, QWORD PTR importDescriptor$[rsp]
+  0045d	8b 40 10	 mov	 eax, DWORD PTR [rax+16]
+  00460	48 8b 4c 24 48	 mov	 rcx, QWORD PTR lpOrigLoadAddress$[rsp]
+  00465	48 03 c8	 add	 rcx, rax
+  00468	48 8b c1	 mov	 rax, rcx
+  0046b	48 89 84 24 18
+	01 00 00	 mov	 QWORD PTR pIAT$13[rsp], rax
+$LN4@StubEntryP:
+
+; 106  :         while (pINT->u1.AddressOfData) {
+
+  00473	48 8b 84 24 98
+	00 00 00	 mov	 rax, QWORD PTR pINT$6[rsp]
+  0047b	48 83 38 00	 cmp	 QWORD PTR [rax], 0
+  0047f	0f 84 1c 01 00
+	00		 je	 $LN5@StubEntryP
+
+; 107  :             //debug
+; 108  :             //WriteFile(hLog, &origThunk->u1.AddressOfData, 8, &bytes, NULL);
+; 109  :             //WriteFile(hLog, "\n", 2, &bytes, NULL);
+; 110  :             //debug
+; 111  :             functionID = NULL;
+
+  00485	48 c7 84 24 d8
+	00 00 00 00 00
+	00 00		 mov	 QWORD PTR functionID$[rsp], 0
+
+; 112  :             if (pINT->u1.Ordinal & IMAGE_ORDINAL_FLAG64) {
+
+  00491	48 8b 84 24 98
+	00 00 00	 mov	 rax, QWORD PTR pINT$6[rsp]
+  00499	48 b9 00 00 00
+	00 00 00 00 80	 mov	 rcx, -9223372036854775808 ; 8000000000000000H
+  004a3	48 8b 00	 mov	 rax, QWORD PTR [rax]
+  004a6	48 23 c1	 and	 rax, rcx
+  004a9	48 85 c0	 test	 rax, rax
+  004ac	74 1b		 je	 SHORT $LN34@StubEntryP
+
+; 113  :                 // import by ordinal
+; 114  :                 functionID = (LPCSTR)(pINT->u1.Ordinal & 0xFFFF);
+
+  004ae	48 8b 84 24 98
+	00 00 00	 mov	 rax, QWORD PTR pINT$6[rsp]
+  004b6	48 8b 00	 mov	 rax, QWORD PTR [rax]
+  004b9	48 25 ff ff 00
+	00		 and	 rax, 65535		; 0000ffffH
+  004bf	48 89 84 24 d8
+	00 00 00	 mov	 QWORD PTR functionID$[rsp], rax
+
+; 115  :             } else {
+
+  004c7	eb 6a		 jmp	 SHORT $LN35@StubEntryP
+$LN34@StubEntryP:
+
+; 116  :                 // import by name
+; 117  :                 functionID = (LPCSTR)((PIMAGE_IMPORT_BY_NAME)((BYTE*)lpOrigLoadAddress + pINT->u1.AddressOfData))->Name;
+
+  004c9	48 8b 84 24 98
+	00 00 00	 mov	 rax, QWORD PTR pINT$6[rsp]
+  004d1	48 8b 00	 mov	 rax, QWORD PTR [rax]
+  004d4	48 8b 4c 24 48	 mov	 rcx, QWORD PTR lpOrigLoadAddress$[rsp]
+  004d9	48 8d 44 01 02	 lea	 rax, QWORD PTR [rcx+rax+2]
+  004de	48 89 84 24 d8
+	00 00 00	 mov	 QWORD PTR functionID$[rsp], rax
+
+; 118  :             //debug
+; 119  :             WriteFile(hLog, functionID, 16, &bytes, NULL);
+
+  004e6	48 c7 44 24 20
+	00 00 00 00	 mov	 QWORD PTR [rsp+32], 0
+  004ef	4c 8d 4c 24 40	 lea	 r9, QWORD PTR bytes$[rsp]
+  004f4	41 b8 10 00 00
+	00		 mov	 r8d, 16
+  004fa	48 8b 94 24 d8
+	00 00 00	 mov	 rdx, QWORD PTR functionID$[rsp]
+  00502	48 8b 4c 24 60	 mov	 rcx, QWORD PTR hLog$[rsp]
+  00507	ff 15 00 00 00
+	00		 call	 QWORD PTR __imp_WriteFile
+
+; 120  :             WriteFile(hLog, "\n", 2, &bytes, NULL);
+
+  0050d	48 c7 44 24 20
+	00 00 00 00	 mov	 QWORD PTR [rsp+32], 0
+  00516	4c 8d 4c 24 40	 lea	 r9, QWORD PTR bytes$[rsp]
+  0051b	41 b8 02 00 00
+	00		 mov	 r8d, 2
+  00521	48 8d 15 00 00
+	00 00		 lea	 rdx, OFFSET FLAT:$SG96966
+  00528	48 8b 4c 24 60	 mov	 rcx, QWORD PTR hLog$[rsp]
+  0052d	ff 15 00 00 00
+	00		 call	 QWORD PTR __imp_WriteFile
+$LN35@StubEntryP:
+
+; 121  :             //debug
+; 122  :             }
+; 123  :             functionAddress = GetProcAddress(hModuleDLL, functionID);
+
+  00533	48 8b 94 24 d8
+	00 00 00	 mov	 rdx, QWORD PTR functionID$[rsp]
+  0053b	48 8b 8c 24 50
+	01 00 00	 mov	 rcx, QWORD PTR hModuleDLL$15[rsp]
+  00543	ff 15 00 00 00
+	00		 call	 QWORD PTR __imp_GetProcAddress
+  00549	48 89 84 24 10
+	01 00 00	 mov	 QWORD PTR functionAddress$[rsp], rax
+
+; 124  :             if (!functionAddress) {
+
+  00551	48 83 bc 24 10
+	01 00 00 00	 cmp	 QWORD PTR functionAddress$[rsp], 0
+  0055a	75 05		 jne	 SHORT $LN36@StubEntryP
+
+; 125  :                 return;
+
+  0055c	e9 4d 08 00 00	 jmp	 $LN1@StubEntryP
+$LN36@StubEntryP:
+
+; 126  :             }
+; 127  :             (pIAT++)->u1.Function = (ULONGLONG)functionAddress;
+
+  00561	48 8b 84 24 18
+	01 00 00	 mov	 rax, QWORD PTR pIAT$13[rsp]
+  00569	48 8b 8c 24 10
+	01 00 00	 mov	 rcx, QWORD PTR functionAddress$[rsp]
+  00571	48 89 08	 mov	 QWORD PTR [rax], rcx
+  00574	48 8b 84 24 18
+	01 00 00	 mov	 rax, QWORD PTR pIAT$13[rsp]
+  0057c	48 83 c0 08	 add	 rax, 8
+  00580	48 89 84 24 18
+	01 00 00	 mov	 QWORD PTR pIAT$13[rsp], rax
+
+; 128  :             pINT += 1;
+
+  00588	48 8b 84 24 98
+	00 00 00	 mov	 rax, QWORD PTR pINT$6[rsp]
+  00590	48 83 c0 08	 add	 rax, 8
+  00594	48 89 84 24 98
+	00 00 00	 mov	 QWORD PTR pINT$6[rsp], rax
+
+; 129  :         }
+
+  0059c	e9 d2 fe ff ff	 jmp	 $LN4@StubEntryP
+$LN5@StubEntryP:
+
+; 130  :         importDescriptor += 1;
+
+  005a1	48 8b 84 24 88
+	00 00 00	 mov	 rax, QWORD PTR importDescriptor$[rsp]
+  005a9	48 83 c0 14	 add	 rax, 20
+  005ad	48 89 84 24 88
+	00 00 00	 mov	 QWORD PTR importDescriptor$[rsp], rax
+
+; 131  :     }
+
+  005b5	e9 d0 fd ff ff	 jmp	 $LN2@StubEntryP
+$LN3@StubEntryP:
+$LN31@StubEntryP:
+$_bound$58:
+
+; 132  : _bound:
+; 133  :     PIMAGE_DATA_DIRECTORY boundDirectory = &pNt->OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_BOUND_IMPORT];
+
+  005ba	b8 08 00 00 00	 mov	 eax, 8
+  005bf	48 6b c0 0b	 imul	 rax, rax, 11
+  005c3	48 8b 4c 24 58	 mov	 rcx, QWORD PTR pNt$[rsp]
+  005c8	48 8d 84 01 88
+	00 00 00	 lea	 rax, QWORD PTR [rcx+rax+136]
+  005d0	48 89 84 24 58
+	01 00 00	 mov	 QWORD PTR boundDirectory$[rsp], rax
+
+; 134  :     if (!boundDirectory->Size) {
+
+  005d8	48 8b 84 24 58
+	01 00 00	 mov	 rax, QWORD PTR boundDirectory$[rsp]
+  005e0	83 78 04 00	 cmp	 DWORD PTR [rax+4], 0
+  005e4	75 0a		 jne	 SHORT $LN37@StubEntryP
+
+; 135  :         goto _delayed;
+
+  005e6	e9 2d 01 00 00	 jmp	 $LN38@StubEntryP
+  005eb	e9 28 01 00 00	 jmp	 $_delayed$59
+$LN37@StubEntryP:
+
+; 136  :     }
+; 137  : 
+; 138  :     PIMAGE_BOUND_IMPORT_DESCRIPTOR boundDescriptor = (PIMAGE_BOUND_IMPORT_DESCRIPTOR)((BYTE*)lpOrigLoadAddress + boundDirectory->VirtualAddress);
+
+  005f0	48 8b 84 24 58
+	01 00 00	 mov	 rax, QWORD PTR boundDirectory$[rsp]
+  005f8	8b 00		 mov	 eax, DWORD PTR [rax]
+  005fa	48 8b 4c 24 48	 mov	 rcx, QWORD PTR lpOrigLoadAddress$[rsp]
+  005ff	48 03 c8	 add	 rcx, rax
+  00602	48 8b c1	 mov	 rax, rcx
+  00605	48 89 44 24 68	 mov	 QWORD PTR boundDescriptor$[rsp], rax
+$LN55@StubEntryP:
+$LN6@StubEntryP:
+
+; 139  :     while (boundDescriptor->TimeDateStamp) {
+
+  0060a	48 8b 44 24 68	 mov	 rax, QWORD PTR boundDescriptor$[rsp]
+  0060f	83 38 00	 cmp	 DWORD PTR [rax], 0
+  00612	0f 84 00 01 00
+	00		 je	 $LN7@StubEntryP
+
+; 140  :         LPCSTR dllName = (LPCSTR)((BYTE*)lpOrigLoadAddress + boundDescriptor->OffsetModuleName);
+
+  00618	48 8b 44 24 68	 mov	 rax, QWORD PTR boundDescriptor$[rsp]
+  0061d	0f b7 40 04	 movzx	 eax, WORD PTR [rax+4]
+  00621	48 8b 4c 24 48	 mov	 rcx, QWORD PTR lpOrigLoadAddress$[rsp]
+  00626	48 03 c8	 add	 rcx, rax
+  00629	48 8b c1	 mov	 rax, rcx
+  0062c	48 89 84 24 a0
+	01 00 00	 mov	 QWORD PTR dllName$17[rsp], rax
+
+; 141  :         HMODULE hModule = LoadLibraryA(dllName);
+
+  00634	48 8b 8c 24 a0
+	01 00 00	 mov	 rcx, QWORD PTR dllName$17[rsp]
+  0063c	ff 15 00 00 00
+	00		 call	 QWORD PTR __imp_LoadLibraryA
+  00642	48 89 84 24 a8
+	01 00 00	 mov	 QWORD PTR hModule$18[rsp], rax
+
+; 142  :         if (!hModule) {
+
+  0064a	48 83 bc 24 a8
+	01 00 00 00	 cmp	 QWORD PTR hModule$18[rsp], 0
+  00653	75 05		 jne	 SHORT $LN39@StubEntryP
+
+; 143  :             return;
+
+  00655	e9 54 07 00 00	 jmp	 $LN1@StubEntryP
+$LN39@StubEntryP:
+
+; 144  :         }
+; 145  :         if (!boundDescriptor->NumberOfModuleForwarderRefs) {
+
+  0065a	48 8b 44 24 68	 mov	 rax, QWORD PTR boundDescriptor$[rsp]
+  0065f	0f b7 40 06	 movzx	 eax, WORD PTR [rax+6]
+  00663	85 c0		 test	 eax, eax
+  00665	75 10		 jne	 SHORT $LN40@StubEntryP
+
+; 146  :             boundDescriptor += 1;
+
+  00667	48 8b 44 24 68	 mov	 rax, QWORD PTR boundDescriptor$[rsp]
+  0066c	48 83 c0 08	 add	 rax, 8
+  00670	48 89 44 24 68	 mov	 QWORD PTR boundDescriptor$[rsp], rax
+
+; 147  :             continue;
+
+  00675	eb 93		 jmp	 SHORT $LN6@StubEntryP
+$LN40@StubEntryP:
+
+; 148  :         }
+; 149  : 
+; 150  :         PIMAGE_BOUND_FORWARDER_REF forwarderRef = (PIMAGE_BOUND_FORWARDER_REF)(boundDescriptor + 1);
+
+  00677	48 8b 44 24 68	 mov	 rax, QWORD PTR boundDescriptor$[rsp]
+  0067c	48 83 c0 08	 add	 rax, 8
+  00680	48 89 84 24 00
+	01 00 00	 mov	 QWORD PTR forwarderRef$12[rsp], rax
+
+; 151  :         for (unsigned int i = 0; i < boundDescriptor->NumberOfModuleForwarderRefs; i++) {
+
+  00688	c7 44 24 74 00
+	00 00 00	 mov	 DWORD PTR i$4[rsp], 0
+  00690	eb 0a		 jmp	 SHORT $LN10@StubEntryP
+$LN8@StubEntryP:
+  00692	8b 44 24 74	 mov	 eax, DWORD PTR i$4[rsp]
+  00696	ff c0		 inc	 eax
+  00698	89 44 24 74	 mov	 DWORD PTR i$4[rsp], eax
+$LN10@StubEntryP:
+  0069c	48 8b 44 24 68	 mov	 rax, QWORD PTR boundDescriptor$[rsp]
+  006a1	0f b7 40 06	 movzx	 eax, WORD PTR [rax+6]
+  006a5	39 44 24 74	 cmp	 DWORD PTR i$4[rsp], eax
+  006a9	73 5b		 jae	 SHORT $LN9@StubEntryP
+
+; 152  :             LPCSTR forwarderDLLName = (LPCSTR)((BYTE*)lpOrigLoadAddress + forwarderRef->OffsetModuleName);
+
+  006ab	48 8b 84 24 00
+	01 00 00	 mov	 rax, QWORD PTR forwarderRef$12[rsp]
+  006b3	0f b7 40 04	 movzx	 eax, WORD PTR [rax+4]
+  006b7	48 8b 4c 24 48	 mov	 rcx, QWORD PTR lpOrigLoadAddress$[rsp]
+  006bc	48 03 c8	 add	 rcx, rax
+  006bf	48 8b c1	 mov	 rax, rcx
+  006c2	48 89 84 24 b0
+	01 00 00	 mov	 QWORD PTR forwarderDLLName$19[rsp], rax
+
+; 153  :             HMODULE hForwarderModule = LoadLibraryA(forwarderDLLName);
+
+  006ca	48 8b 8c 24 b0
+	01 00 00	 mov	 rcx, QWORD PTR forwarderDLLName$19[rsp]
+  006d2	ff 15 00 00 00
+	00		 call	 QWORD PTR __imp_LoadLibraryA
+  006d8	48 89 84 24 b8
+	01 00 00	 mov	 QWORD PTR hForwarderModule$20[rsp], rax
+
+; 154  :             if (!hForwarderModule) {
+
+  006e0	48 83 bc 24 b8
+	01 00 00 00	 cmp	 QWORD PTR hForwarderModule$20[rsp], 0
+  006e9	75 05		 jne	 SHORT $LN41@StubEntryP
+
+; 155  :                 return;
+
+  006eb	e9 be 06 00 00	 jmp	 $LN1@StubEntryP
+$LN41@StubEntryP:
+
+; 156  :             }
+; 157  :             forwarderRef += 1;
+
+  006f0	48 8b 84 24 00
+	01 00 00	 mov	 rax, QWORD PTR forwarderRef$12[rsp]
+  006f8	48 83 c0 08	 add	 rax, 8
+  006fc	48 89 84 24 00
+	01 00 00	 mov	 QWORD PTR forwarderRef$12[rsp], rax
+
+; 158  :         }
+
+  00704	eb 8c		 jmp	 SHORT $LN8@StubEntryP
+$LN9@StubEntryP:
+
+; 159  :         boundDescriptor = (PIMAGE_BOUND_IMPORT_DESCRIPTOR)forwarderRef;
+
+  00706	48 8b 84 24 00
+	01 00 00	 mov	 rax, QWORD PTR forwarderRef$12[rsp]
+  0070e	48 89 44 24 68	 mov	 QWORD PTR boundDescriptor$[rsp], rax
+
+; 160  :     }
+
+  00713	e9 f2 fe ff ff	 jmp	 $LN55@StubEntryP
+$LN7@StubEntryP:
+$LN38@StubEntryP:
+$_delayed$59:
+
+; 161  : _delayed:
+; 162  :     PIMAGE_DATA_DIRECTORY delayedDirectory = &pNt->OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_DELAY_IMPORT];
+
+  00718	b8 08 00 00 00	 mov	 eax, 8
+  0071d	48 6b c0 0d	 imul	 rax, rax, 13
+  00721	48 8b 4c 24 58	 mov	 rcx, QWORD PTR pNt$[rsp]
+  00726	48 8d 84 01 88
+	00 00 00	 lea	 rax, QWORD PTR [rcx+rax+136]
+  0072e	48 89 84 24 60
+	01 00 00	 mov	 QWORD PTR delayedDirectory$[rsp], rax
+
+; 163  :     if (!delayedDirectory->Size) {
+
+  00736	48 8b 84 24 60
+	01 00 00	 mov	 rax, QWORD PTR delayedDirectory$[rsp]
+  0073e	83 78 04 00	 cmp	 DWORD PTR [rax+4], 0
+  00742	75 0a		 jne	 SHORT $LN42@StubEntryP
+
+; 164  :         goto _reloc;
+
+  00744	e9 b2 01 00 00	 jmp	 $LN43@StubEntryP
+  00749	e9 ad 01 00 00	 jmp	 $_reloc$60
+$LN42@StubEntryP:
+
+; 165  :     }
+; 166  : 
+; 167  :     PIMAGE_DELAYLOAD_DESCRIPTOR delayloadDescriptor = (PIMAGE_DELAYLOAD_DESCRIPTOR)((BYTE*)lpOrigLoadAddress + delayedDirectory->VirtualAddress);
+
+  0074e	48 8b 84 24 60
+	01 00 00	 mov	 rax, QWORD PTR delayedDirectory$[rsp]
+  00756	8b 00		 mov	 eax, DWORD PTR [rax]
+  00758	48 8b 4c 24 48	 mov	 rcx, QWORD PTR lpOrigLoadAddress$[rsp]
+  0075d	48 03 c8	 add	 rcx, rax
+  00760	48 8b c1	 mov	 rax, rcx
+  00763	48 89 84 24 a0
+	00 00 00	 mov	 QWORD PTR delayloadDescriptor$[rsp], rax
+$LN11@StubEntryP:
+
+; 168  :     while (delayloadDescriptor->DllNameRVA) {
+
+  0076b	48 8b 84 24 a0
+	00 00 00	 mov	 rax, QWORD PTR delayloadDescriptor$[rsp]
+  00773	83 78 04 00	 cmp	 DWORD PTR [rax+4], 0
+  00777	0f 84 7e 01 00
+	00		 je	 $LN12@StubEntryP
+
+; 169  :         LPCSTR dllName = (LPCSTR)((BYTE*)lpOrigLoadAddress + delayloadDescriptor->DllNameRVA);
+
+  0077d	48 8b 84 24 a0
+	00 00 00	 mov	 rax, QWORD PTR delayloadDescriptor$[rsp]
+  00785	8b 40 04	 mov	 eax, DWORD PTR [rax+4]
+  00788	48 8b 4c 24 48	 mov	 rcx, QWORD PTR lpOrigLoadAddress$[rsp]
+  0078d	48 03 c8	 add	 rcx, rax
+  00790	48 8b c1	 mov	 rax, rcx
+  00793	48 89 84 24 c0
+	01 00 00	 mov	 QWORD PTR dllName$21[rsp], rax
+
+; 170  :         HMODULE hDelayModule = LoadLibraryA(dllName);
+
+  0079b	48 8b 8c 24 c0
+	01 00 00	 mov	 rcx, QWORD PTR dllName$21[rsp]
+  007a3	ff 15 00 00 00
+	00		 call	 QWORD PTR __imp_LoadLibraryA
+  007a9	48 89 84 24 20
+	01 00 00	 mov	 QWORD PTR hDelayModule$14[rsp], rax
+
+; 171  :         if (!hDelayModule) {
+
+  007b1	48 83 bc 24 20
+	01 00 00 00	 cmp	 QWORD PTR hDelayModule$14[rsp], 0
+  007ba	75 05		 jne	 SHORT $LN44@StubEntryP
+
+; 172  :             return;
+
+  007bc	e9 ed 05 00 00	 jmp	 $LN1@StubEntryP
+$LN44@StubEntryP:
+
+; 173  :         }
+; 174  : 
+; 175  :         PIMAGE_THUNK_DATA delayedINT = (PIMAGE_THUNK_DATA)((BYTE*)lpOrigLoadAddress + delayloadDescriptor->ImportNameTableRVA);
+
+  007c1	48 8b 84 24 a0
+	00 00 00	 mov	 rax, QWORD PTR delayloadDescriptor$[rsp]
+  007c9	8b 40 10	 mov	 eax, DWORD PTR [rax+16]
+  007cc	48 8b 4c 24 48	 mov	 rcx, QWORD PTR lpOrigLoadAddress$[rsp]
+  007d1	48 03 c8	 add	 rcx, rax
+  007d4	48 8b c1	 mov	 rax, rcx
+  007d7	48 89 84 24 b0
+	00 00 00	 mov	 QWORD PTR delayedINT$7[rsp], rax
+
+; 176  :         PIMAGE_THUNK_DATA delayedIAT = (PIMAGE_THUNK_DATA)((BYTE*)lpOrigLoadAddress + delayloadDescriptor->ImportAddressTableRVA);
+
+  007df	48 8b 84 24 a0
+	00 00 00	 mov	 rax, QWORD PTR delayloadDescriptor$[rsp]
+  007e7	8b 40 0c	 mov	 eax, DWORD PTR [rax+12]
+  007ea	48 8b 4c 24 48	 mov	 rcx, QWORD PTR lpOrigLoadAddress$[rsp]
+  007ef	48 03 c8	 add	 rcx, rax
+  007f2	48 8b c1	 mov	 rax, rcx
+  007f5	48 89 84 24 e8
+	00 00 00	 mov	 QWORD PTR delayedIAT$11[rsp], rax
+$LN13@StubEntryP:
+
+; 177  :         while (delayedIAT->u1.AddressOfData) {
+
+  007fd	48 8b 84 24 e8
+	00 00 00	 mov	 rax, QWORD PTR delayedIAT$11[rsp]
+  00805	48 83 38 00	 cmp	 QWORD PTR [rax], 0
+  00809	0f 84 d3 00 00
+	00		 je	 $LN14@StubEntryP
+
+; 178  :             FARPROC delayedFunction = NULL;
+
+  0080f	48 c7 84 24 e0
+	00 00 00 00 00
+	00 00		 mov	 QWORD PTR delayedFunction$10[rsp], 0
+
+; 179  :             if (delayedINT->u1.Ordinal & IMAGE_ORDINAL_FLAG64) {
+
+  0081b	48 8b 84 24 b0
+	00 00 00	 mov	 rax, QWORD PTR delayedINT$7[rsp]
+  00823	48 b9 00 00 00
+	00 00 00 00 80	 mov	 rcx, -9223372036854775808 ; 8000000000000000H
+  0082d	48 8b 00	 mov	 rax, QWORD PTR [rax]
+  00830	48 23 c1	 and	 rax, rcx
+  00833	48 85 c0	 test	 rax, rax
+  00836	74 2c		 je	 SHORT $LN45@StubEntryP
+
+; 180  :                 delayedFunction = GetProcAddress(hDelayModule, (LPCSTR)(delayedINT->u1.Ordinal & 0xFFFF));
+
+  00838	48 8b 84 24 b0
+	00 00 00	 mov	 rax, QWORD PTR delayedINT$7[rsp]
+  00840	48 8b 00	 mov	 rax, QWORD PTR [rax]
+  00843	48 25 ff ff 00
+	00		 and	 rax, 65535		; 0000ffffH
+  00849	48 8b d0	 mov	 rdx, rax
+  0084c	48 8b 8c 24 20
+	01 00 00	 mov	 rcx, QWORD PTR hDelayModule$14[rsp]
+  00854	ff 15 00 00 00
+	00		 call	 QWORD PTR __imp_GetProcAddress
+  0085a	48 89 84 24 e0
+	00 00 00	 mov	 QWORD PTR delayedFunction$10[rsp], rax
+
+; 181  :             } else {
+
+  00862	eb 2e		 jmp	 SHORT $LN46@StubEntryP
+$LN45@StubEntryP:
+
+; 182  :                 delayedFunction = GetProcAddress(hDelayModule, ((PIMAGE_IMPORT_BY_NAME)((BYTE*)lpOrigLoadAddress + delayedINT->u1.AddressOfData))->Name);
+
+  00864	48 8b 84 24 b0
+	00 00 00	 mov	 rax, QWORD PTR delayedINT$7[rsp]
+  0086c	48 8b 00	 mov	 rax, QWORD PTR [rax]
+  0086f	48 8b 4c 24 48	 mov	 rcx, QWORD PTR lpOrigLoadAddress$[rsp]
+  00874	48 8d 44 01 02	 lea	 rax, QWORD PTR [rcx+rax+2]
+  00879	48 8b d0	 mov	 rdx, rax
+  0087c	48 8b 8c 24 20
+	01 00 00	 mov	 rcx, QWORD PTR hDelayModule$14[rsp]
+  00884	ff 15 00 00 00
+	00		 call	 QWORD PTR __imp_GetProcAddress
+  0088a	48 89 84 24 e0
+	00 00 00	 mov	 QWORD PTR delayedFunction$10[rsp], rax
+$LN46@StubEntryP:
+
+; 183  :             }
+; 184  :             if (!delayedFunction) {
+
+  00892	48 83 bc 24 e0
+	00 00 00 00	 cmp	 QWORD PTR delayedFunction$10[rsp], 0
+  0089b	75 05		 jne	 SHORT $LN47@StubEntryP
+
+; 185  :                 return;
+
+  0089d	e9 0c 05 00 00	 jmp	 $LN1@StubEntryP
+$LN47@StubEntryP:
+
+; 186  :             }
+; 187  :             (delayedIAT++)->u1.Function = (ULONGLONG)delayedFunction;
+
+  008a2	48 8b 84 24 e8
+	00 00 00	 mov	 rax, QWORD PTR delayedIAT$11[rsp]
+  008aa	48 8b 8c 24 e0
+	00 00 00	 mov	 rcx, QWORD PTR delayedFunction$10[rsp]
+  008b2	48 89 08	 mov	 QWORD PTR [rax], rcx
+  008b5	48 8b 84 24 e8
+	00 00 00	 mov	 rax, QWORD PTR delayedIAT$11[rsp]
+  008bd	48 83 c0 08	 add	 rax, 8
+  008c1	48 89 84 24 e8
+	00 00 00	 mov	 QWORD PTR delayedIAT$11[rsp], rax
+
+; 188  :             delayedINT += 1;
+
+  008c9	48 8b 84 24 b0
+	00 00 00	 mov	 rax, QWORD PTR delayedINT$7[rsp]
+  008d1	48 83 c0 08	 add	 rax, 8
+  008d5	48 89 84 24 b0
+	00 00 00	 mov	 QWORD PTR delayedINT$7[rsp], rax
+
+; 189  :         }
+
+  008dd	e9 1b ff ff ff	 jmp	 $LN13@StubEntryP
+$LN14@StubEntryP:
+
+; 190  :         delayloadDescriptor += 1;
+
+  008e2	48 8b 84 24 a0
+	00 00 00	 mov	 rax, QWORD PTR delayloadDescriptor$[rsp]
+  008ea	48 83 c0 20	 add	 rax, 32			; 00000020H
+  008ee	48 89 84 24 a0
+	00 00 00	 mov	 QWORD PTR delayloadDescriptor$[rsp], rax
+
+; 191  :     }
+
+  008f6	e9 70 fe ff ff	 jmp	 $LN11@StubEntryP
+$LN12@StubEntryP:
+$LN43@StubEntryP:
+$_reloc$60:
+
+; 192  : _reloc:
+; 193  :     //ULONGLONG delta = (ULONGLONG)((ULONGLONG)lpOrigLoadAddress + (ULONGLONG)stub_load_address - pNt->OptionalHeader.ImageBase);
+; 194  :     ULONGLONG delta = (ULONGLONG)((ULONGLONG)stub_load_address - pNt->OptionalHeader.ImageBase);
+
+  008fb	48 8b 44 24 58	 mov	 rax, QWORD PTR pNt$[rsp]
+  00900	48 8b 40 30	 mov	 rax, QWORD PTR [rax+48]
+  00904	48 8b 8c 24 f0
+	00 00 00	 mov	 rcx, QWORD PTR stub_load_address$[rsp]
+  0090c	48 2b c8	 sub	 rcx, rax
+  0090f	48 8b c1	 mov	 rax, rcx
+  00912	48 89 84 24 30
+	01 00 00	 mov	 QWORD PTR delta$[rsp], rax
+
+; 195  :     PIMAGE_DATA_DIRECTORY relocationDirectory = &pNt->OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_BASERELOC];
+
+  0091a	b8 08 00 00 00	 mov	 eax, 8
+  0091f	48 6b c0 05	 imul	 rax, rax, 5
+  00923	48 8b 4c 24 58	 mov	 rcx, QWORD PTR pNt$[rsp]
+  00928	48 8d 84 01 88
+	00 00 00	 lea	 rax, QWORD PTR [rcx+rax+136]
+  00930	48 89 84 24 68
+	01 00 00	 mov	 QWORD PTR relocationDirectory$[rsp], rax
+
+; 196  :     if (!relocationDirectory->Size) {
+
+  00938	48 8b 84 24 68
+	01 00 00	 mov	 rax, QWORD PTR relocationDirectory$[rsp]
+  00940	83 78 04 00	 cmp	 DWORD PTR [rax+4], 0
+  00944	75 0a		 jne	 SHORT $LN48@StubEntryP
+
+; 197  :        // goto _exception;
+; 198  :         goto _run;
+
+  00946	e9 9b 03 00 00	 jmp	 $LN49@StubEntryP
+  0094b	e9 96 03 00 00	 jmp	 $_run$61
+$LN48@StubEntryP:
+
+; 199  :     }
+; 200  : 
+; 201  :     PIMAGE_BASE_RELOCATION relocation = (PIMAGE_BASE_RELOCATION)((BYTE*)lpOrigLoadAddress + relocationDirectory->VirtualAddress);
+
+  00950	48 8b 84 24 68
+	01 00 00	 mov	 rax, QWORD PTR relocationDirectory$[rsp]
+  00958	8b 00		 mov	 eax, DWORD PTR [rax]
+  0095a	48 8b 4c 24 48	 mov	 rcx, QWORD PTR lpOrigLoadAddress$[rsp]
+  0095f	48 03 c8	 add	 rcx, rax
+  00962	48 8b c1	 mov	 rax, rcx
+  00965	48 89 84 24 80
+	00 00 00	 mov	 QWORD PTR relocation$[rsp], rax
+$LN15@StubEntryP:
+
+; 202  :     //debug
+; 203  :     //WriteFile(hLog, relocation, relocation->SizeOfBlock, &bytes, NULL);
+; 204  :     //WriteFile(hLog, "\n", 2, &bytes, NULL);
+; 205  :     //debug
+; 206  : 
+; 207  :     while (relocation->VirtualAddress) {
+
+  0096d	48 8b 84 24 80
+	00 00 00	 mov	 rax, QWORD PTR relocation$[rsp]
+  00975	83 38 00	 cmp	 DWORD PTR [rax], 0
+  00978	0f 84 36 02 00
+	00		 je	 $LN16@StubEntryP
+
+; 208  :         BYTE* relocationBase = (BYTE*)lpOrigLoadAddress + relocation->VirtualAddress;
+
+  0097e	48 8b 84 24 80
+	00 00 00	 mov	 rax, QWORD PTR relocation$[rsp]
+  00986	8b 00		 mov	 eax, DWORD PTR [rax]
+  00988	48 8b 4c 24 48	 mov	 rcx, QWORD PTR lpOrigLoadAddress$[rsp]
+  0098d	48 03 c8	 add	 rcx, rax
+  00990	48 8b c1	 mov	 rax, rcx
+  00993	48 89 84 24 b8
+	00 00 00	 mov	 QWORD PTR relocationBase$8[rsp], rax
+
+; 209  : 
+; 210  :         unsigned long long numEntries = (relocation->SizeOfBlock - sizeof(IMAGE_BASE_RELOCATION)) / sizeof(WORD);
+
+  0099b	48 8b 84 24 80
+	00 00 00	 mov	 rax, QWORD PTR relocation$[rsp]
+  009a3	8b 40 04	 mov	 eax, DWORD PTR [rax+4]
+  009a6	48 83 e8 08	 sub	 rax, 8
+  009aa	33 d2		 xor	 edx, edx
+  009ac	b9 02 00 00 00	 mov	 ecx, 2
+  009b1	48 f7 f1	 div	 rcx
+  009b4	48 89 84 24 70
+	01 00 00	 mov	 QWORD PTR numEntries$16[rsp], rax
+
+; 211  :             //debug
+; 212  :             WriteFile(hLog, &numEntries, 8, &bytes, NULL);
+
+  009bc	48 c7 44 24 20
+	00 00 00 00	 mov	 QWORD PTR [rsp+32], 0
+  009c5	4c 8d 4c 24 40	 lea	 r9, QWORD PTR bytes$[rsp]
+  009ca	41 b8 08 00 00
+	00		 mov	 r8d, 8
+  009d0	48 8d 94 24 70
+	01 00 00	 lea	 rdx, QWORD PTR numEntries$16[rsp]
+  009d8	48 8b 4c 24 60	 mov	 rcx, QWORD PTR hLog$[rsp]
+  009dd	ff 15 00 00 00
+	00		 call	 QWORD PTR __imp_WriteFile
+
+; 213  :             WriteFile(hLog, "\n\n\n\n", 4, &bytes, NULL);
+
+  009e3	48 c7 44 24 20
+	00 00 00 00	 mov	 QWORD PTR [rsp+32], 0
+  009ec	4c 8d 4c 24 40	 lea	 r9, QWORD PTR bytes$[rsp]
+  009f1	41 b8 04 00 00
+	00		 mov	 r8d, 4
+  009f7	48 8d 15 00 00
+	00 00		 lea	 rdx, OFFSET FLAT:$SG96981
+  009fe	48 8b 4c 24 60	 mov	 rcx, QWORD PTR hLog$[rsp]
+  00a03	ff 15 00 00 00
+	00		 call	 QWORD PTR __imp_WriteFile
+
+; 214  :             //debug
+; 215  :         PWORD relocationEntry = reinterpret_cast<PWORD>((BYTE*)(relocation + 1));
+
+  00a09	48 8b 84 24 80
+	00 00 00	 mov	 rax, QWORD PTR relocation$[rsp]
+  00a11	48 83 c0 08	 add	 rax, 8
+  00a15	48 89 84 24 c0
+	00 00 00	 mov	 QWORD PTR relocationEntry$9[rsp], rax
+
+; 216  :         for (unsigned int i = 0; i < numEntries; i++) {
+
+  00a1d	c7 44 24 78 00
+	00 00 00	 mov	 DWORD PTR i$5[rsp], 0
+  00a25	eb 0a		 jmp	 SHORT $LN19@StubEntryP
+$LN17@StubEntryP:
+  00a27	8b 44 24 78	 mov	 eax, DWORD PTR i$5[rsp]
+  00a2b	ff c0		 inc	 eax
+  00a2d	89 44 24 78	 mov	 DWORD PTR i$5[rsp], eax
+$LN19@StubEntryP:
+  00a31	8b 44 24 78	 mov	 eax, DWORD PTR i$5[rsp]
+  00a35	48 3b 84 24 70
+	01 00 00	 cmp	 rax, QWORD PTR numEntries$16[rsp]
+  00a3d	0f 83 4b 01 00
+	00		 jae	 $LN18@StubEntryP
+
+; 217  :             WORD type = *relocationEntry >> 12;
+
+  00a43	48 8b 84 24 c0
+	00 00 00	 mov	 rax, QWORD PTR relocationEntry$9[rsp]
+  00a4b	0f b7 00	 movzx	 eax, WORD PTR [rax]
+  00a4e	c1 f8 0c	 sar	 eax, 12
+  00a51	66 89 44 24 70	 mov	 WORD PTR type$3[rsp], ax
+
+; 218  :             WORD offset = *relocationEntry & 0x0FFF;
+
+  00a56	48 8b 84 24 c0
+	00 00 00	 mov	 rax, QWORD PTR relocationEntry$9[rsp]
+  00a5e	0f b7 00	 movzx	 eax, WORD PTR [rax]
+  00a61	25 ff 0f 00 00	 and	 eax, 4095		; 00000fffH
+  00a66	66 89 44 24 50	 mov	 WORD PTR offset$1[rsp], ax
+
+; 219  :             //debug
+; 220  :             WriteFile(hLog, relocationEntry, 8, &bytes, NULL);
+
+  00a6b	48 c7 44 24 20
+	00 00 00 00	 mov	 QWORD PTR [rsp+32], 0
+  00a74	4c 8d 4c 24 40	 lea	 r9, QWORD PTR bytes$[rsp]
+  00a79	41 b8 08 00 00
+	00		 mov	 r8d, 8
+  00a7f	48 8b 94 24 c0
+	00 00 00	 mov	 rdx, QWORD PTR relocationEntry$9[rsp]
+  00a87	48 8b 4c 24 60	 mov	 rcx, QWORD PTR hLog$[rsp]
+  00a8c	ff 15 00 00 00
+	00		 call	 QWORD PTR __imp_WriteFile
+
+; 221  :             WriteFile(hLog, "\n", 1, &bytes, NULL);
+
+  00a92	48 c7 44 24 20
+	00 00 00 00	 mov	 QWORD PTR [rsp+32], 0
+  00a9b	4c 8d 4c 24 40	 lea	 r9, QWORD PTR bytes$[rsp]
+  00aa0	41 b8 01 00 00
+	00		 mov	 r8d, 1
+  00aa6	48 8d 15 00 00
+	00 00		 lea	 rdx, OFFSET FLAT:$SG96982
+  00aad	48 8b 4c 24 60	 mov	 rcx, QWORD PTR hLog$[rsp]
+  00ab2	ff 15 00 00 00
+	00		 call	 QWORD PTR __imp_WriteFile
+
+; 222  :             //debug
+; 223  :             if(type == IMAGE_REL_BASED_DIR64) {
+
+  00ab8	0f b7 44 24 70	 movzx	 eax, WORD PTR type$3[rsp]
+  00abd	83 f8 0a	 cmp	 eax, 10
+  00ac0	75 58		 jne	 SHORT $LN50@StubEntryP
+
+; 224  :                 //*(ULONGLONG*)(relocationBase + offset) += (ULONGLONG)stub_load_address + (ULONGLONG) lpOrigLoadAddress;
+; 225  :                 *(ULONGLONG*)(relocationBase + offset) += (ULONGLONG)stub_load_address;
+
+  00ac2	0f b7 44 24 50	 movzx	 eax, WORD PTR offset$1[rsp]
+  00ac7	48 8b 8c 24 b8
+	00 00 00	 mov	 rcx, QWORD PTR relocationBase$8[rsp]
+  00acf	48 8b 04 01	 mov	 rax, QWORD PTR [rcx+rax]
+  00ad3	48 03 84 24 f0
+	00 00 00	 add	 rax, QWORD PTR stub_load_address$[rsp]
+  00adb	0f b7 4c 24 50	 movzx	 ecx, WORD PTR offset$1[rsp]
+  00ae0	48 8b 94 24 b8
+	00 00 00	 mov	 rdx, QWORD PTR relocationBase$8[rsp]
+  00ae8	48 89 04 0a	 mov	 QWORD PTR [rdx+rcx], rax
+
+; 226  :                 //ULONGLONG* fixup = (ULONGLONG*)(relocationBase + offset);
+; 227  :                 //debug
+; 228  :                 //WriteFile(hLog, (relocationBase + offset), 8, &bytes, NULL);
+; 229  :                 //WriteFile(hLog, "\n", 1, &bytes, NULL);
+; 230  :                 //debug
+; 231  :                 *(ULONGLONG*)(relocationBase + offset) -= (ULONGLONG) pNt->OptionalHeader.ImageBase;
+
+  00aec	0f b7 44 24 50	 movzx	 eax, WORD PTR offset$1[rsp]
+  00af1	48 8b 8c 24 b8
+	00 00 00	 mov	 rcx, QWORD PTR relocationBase$8[rsp]
+  00af9	48 8b 54 24 58	 mov	 rdx, QWORD PTR pNt$[rsp]
+  00afe	48 8b 52 30	 mov	 rdx, QWORD PTR [rdx+48]
+  00b02	48 8b 04 01	 mov	 rax, QWORD PTR [rcx+rax]
+  00b06	48 2b c2	 sub	 rax, rdx
+  00b09	0f b7 4c 24 50	 movzx	 ecx, WORD PTR offset$1[rsp]
+  00b0e	48 8b 94 24 b8
+	00 00 00	 mov	 rdx, QWORD PTR relocationBase$8[rsp]
+  00b16	48 89 04 0a	 mov	 QWORD PTR [rdx+rcx], rax
+$LN50@StubEntryP:
+
+; 232  :                 //*fixup += delta;
+; 233  :             }
+; 234  :             //debug
+; 235  :             WriteFile(hLog, (relocationBase + offset), 8, &bytes, NULL);
+
+  00b1a	0f b7 44 24 50	 movzx	 eax, WORD PTR offset$1[rsp]
+  00b1f	48 8b 8c 24 b8
+	00 00 00	 mov	 rcx, QWORD PTR relocationBase$8[rsp]
+  00b27	48 03 c8	 add	 rcx, rax
+  00b2a	48 8b c1	 mov	 rax, rcx
+  00b2d	48 c7 44 24 20
+	00 00 00 00	 mov	 QWORD PTR [rsp+32], 0
+  00b36	4c 8d 4c 24 40	 lea	 r9, QWORD PTR bytes$[rsp]
+  00b3b	41 b8 08 00 00
+	00		 mov	 r8d, 8
+  00b41	48 8b d0	 mov	 rdx, rax
+  00b44	48 8b 4c 24 60	 mov	 rcx, QWORD PTR hLog$[rsp]
+  00b49	ff 15 00 00 00
+	00		 call	 QWORD PTR __imp_WriteFile
+
+; 236  :             WriteFile(hLog, "\n\n", 1, &bytes, NULL);
+
+  00b4f	48 c7 44 24 20
+	00 00 00 00	 mov	 QWORD PTR [rsp+32], 0
+  00b58	4c 8d 4c 24 40	 lea	 r9, QWORD PTR bytes$[rsp]
+  00b5d	41 b8 01 00 00
+	00		 mov	 r8d, 1
+  00b63	48 8d 15 00 00
+	00 00		 lea	 rdx, OFFSET FLAT:$SG96984
+  00b6a	48 8b 4c 24 60	 mov	 rcx, QWORD PTR hLog$[rsp]
+  00b6f	ff 15 00 00 00
+	00		 call	 QWORD PTR __imp_WriteFile
+
+; 237  :             //debug
+; 238  :             relocationEntry += 1;
+
+  00b75	48 8b 84 24 c0
+	00 00 00	 mov	 rax, QWORD PTR relocationEntry$9[rsp]
+  00b7d	48 83 c0 02	 add	 rax, 2
+  00b81	48 89 84 24 c0
+	00 00 00	 mov	 QWORD PTR relocationEntry$9[rsp], rax
+
+; 239  :         }
+
+  00b89	e9 99 fe ff ff	 jmp	 $LN17@StubEntryP
+$LN18@StubEntryP:
+
+; 240  :         relocation = (PIMAGE_BASE_RELOCATION)((BYTE*)relocation + relocation->SizeOfBlock);
+
+  00b8e	48 8b 84 24 80
+	00 00 00	 mov	 rax, QWORD PTR relocation$[rsp]
+  00b96	8b 40 04	 mov	 eax, DWORD PTR [rax+4]
+  00b99	48 8b 8c 24 80
+	00 00 00	 mov	 rcx, QWORD PTR relocation$[rsp]
+  00ba1	48 03 c8	 add	 rcx, rax
+  00ba4	48 8b c1	 mov	 rax, rcx
+  00ba7	48 89 84 24 80
+	00 00 00	 mov	 QWORD PTR relocation$[rsp], rax
+
+; 241  :     }
+
+  00baf	e9 b9 fd ff ff	 jmp	 $LN15@StubEntryP
+$LN16@StubEntryP:
+
+; 242  :    Sleep(30000);
+
+  00bb4	b9 30 75 00 00	 mov	 ecx, 30000		; 00007530H
+  00bb9	ff 15 00 00 00
+	00		 call	 QWORD PTR __imp_Sleep
+$_exception$62:
+
+; 243  : _exception:
+; 244  :     PIMAGE_DATA_DIRECTORY exceptionDirectory = &pNt->OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_EXCEPTION];
+
+  00bbf	b8 08 00 00 00	 mov	 eax, 8
+  00bc4	48 6b c0 03	 imul	 rax, rax, 3
+  00bc8	48 8b 4c 24 58	 mov	 rcx, QWORD PTR pNt$[rsp]
+  00bcd	48 8d 84 01 88
+	00 00 00	 lea	 rax, QWORD PTR [rcx+rax+136]
+  00bd5	48 89 84 24 28
+	01 00 00	 mov	 QWORD PTR exceptionDirectory$[rsp], rax
+
+; 245  :     if (!exceptionDirectory->Size) {
+
+  00bdd	48 8b 84 24 28
+	01 00 00	 mov	 rax, QWORD PTR exceptionDirectory$[rsp]
+  00be5	83 78 04 00	 cmp	 DWORD PTR [rax+4], 0
+  00be9	75 0a		 jne	 SHORT $LN51@StubEntryP
+
+; 246  :         goto _run;
+
+  00beb	e9 f6 00 00 00	 jmp	 $LN52@StubEntryP
+  00bf0	e9 f1 00 00 00	 jmp	 $_run$61
+$LN51@StubEntryP:
+
+; 247  :     }
+; 248  :     PIMAGE_RUNTIME_FUNCTION_ENTRY functionEntries = (PIMAGE_RUNTIME_FUNCTION_ENTRY)((BYTE*)lpOrigLoadAddress + exceptionDirectory->VirtualAddress);
+
+  00bf5	48 8b 84 24 28
+	01 00 00	 mov	 rax, QWORD PTR exceptionDirectory$[rsp]
+  00bfd	8b 00		 mov	 eax, DWORD PTR [rax]
+  00bff	48 8b 4c 24 48	 mov	 rcx, QWORD PTR lpOrigLoadAddress$[rsp]
+  00c04	48 03 c8	 add	 rcx, rax
+  00c07	48 8b c1	 mov	 rax, rcx
+  00c0a	48 89 84 24 a8
+	00 00 00	 mov	 QWORD PTR functionEntries$[rsp], rax
+
+; 249  :     DWORD numEntries = exceptionDirectory->Size / sizeof(IMAGE_RUNTIME_FUNCTION_ENTRY);
+
+  00c12	48 8b 84 24 28
+	01 00 00	 mov	 rax, QWORD PTR exceptionDirectory$[rsp]
+  00c1a	8b 40 04	 mov	 eax, DWORD PTR [rax+4]
+  00c1d	33 d2		 xor	 edx, edx
+  00c1f	b9 0c 00 00 00	 mov	 ecx, 12
+  00c24	48 f7 f1	 div	 rcx
+  00c27	89 84 24 0c 01
+	00 00		 mov	 DWORD PTR numEntries$[rsp], eax
+
+; 250  : 
+; 251  :     for (DWORD i = 0; i < numEntries; ++i) {
+
+  00c2e	c7 44 24 54 00
+	00 00 00	 mov	 DWORD PTR i$2[rsp], 0
+  00c36	eb 0a		 jmp	 SHORT $LN22@StubEntryP
+$LN20@StubEntryP:
+  00c38	8b 44 24 54	 mov	 eax, DWORD PTR i$2[rsp]
+  00c3c	ff c0		 inc	 eax
+  00c3e	89 44 24 54	 mov	 DWORD PTR i$2[rsp], eax
+$LN22@StubEntryP:
+  00c42	8b 84 24 0c 01
+	00 00		 mov	 eax, DWORD PTR numEntries$[rsp]
+  00c49	39 44 24 54	 cmp	 DWORD PTR i$2[rsp], eax
+  00c4d	0f 83 93 00 00
+	00		 jae	 $LN21@StubEntryP
+
+; 252  :         functionEntries[i].BeginAddress += delta;
+
+  00c53	8b 44 24 54	 mov	 eax, DWORD PTR i$2[rsp]
+  00c57	48 6b c0 0c	 imul	 rax, rax, 12
+  00c5b	48 8b 8c 24 a8
+	00 00 00	 mov	 rcx, QWORD PTR functionEntries$[rsp]
+  00c63	8b 04 01	 mov	 eax, DWORD PTR [rcx+rax]
+  00c66	48 03 84 24 30
+	01 00 00	 add	 rax, QWORD PTR delta$[rsp]
+  00c6e	8b 4c 24 54	 mov	 ecx, DWORD PTR i$2[rsp]
+  00c72	48 6b c9 0c	 imul	 rcx, rcx, 12
+  00c76	48 8b 94 24 a8
+	00 00 00	 mov	 rdx, QWORD PTR functionEntries$[rsp]
+  00c7e	89 04 0a	 mov	 DWORD PTR [rdx+rcx], eax
+
+; 253  :         functionEntries[i].EndAddress += delta;
+
+  00c81	8b 44 24 54	 mov	 eax, DWORD PTR i$2[rsp]
+  00c85	48 6b c0 0c	 imul	 rax, rax, 12
+  00c89	48 8b 8c 24 a8
+	00 00 00	 mov	 rcx, QWORD PTR functionEntries$[rsp]
+  00c91	8b 44 01 04	 mov	 eax, DWORD PTR [rcx+rax+4]
+  00c95	48 03 84 24 30
+	01 00 00	 add	 rax, QWORD PTR delta$[rsp]
+  00c9d	8b 4c 24 54	 mov	 ecx, DWORD PTR i$2[rsp]
+  00ca1	48 6b c9 0c	 imul	 rcx, rcx, 12
+  00ca5	48 8b 94 24 a8
+	00 00 00	 mov	 rdx, QWORD PTR functionEntries$[rsp]
+  00cad	89 44 0a 04	 mov	 DWORD PTR [rdx+rcx+4], eax
+
+; 254  :         functionEntries[i].UnwindData += delta;
+
+  00cb1	8b 44 24 54	 mov	 eax, DWORD PTR i$2[rsp]
+  00cb5	48 6b c0 0c	 imul	 rax, rax, 12
+  00cb9	48 8b 8c 24 a8
+	00 00 00	 mov	 rcx, QWORD PTR functionEntries$[rsp]
+  00cc1	8b 44 01 08	 mov	 eax, DWORD PTR [rcx+rax+8]
+  00cc5	48 03 84 24 30
+	01 00 00	 add	 rax, QWORD PTR delta$[rsp]
+  00ccd	8b 4c 24 54	 mov	 ecx, DWORD PTR i$2[rsp]
+  00cd1	48 6b c9 0c	 imul	 rcx, rcx, 12
+  00cd5	48 8b 94 24 a8
+	00 00 00	 mov	 rdx, QWORD PTR functionEntries$[rsp]
+  00cdd	89 44 0a 08	 mov	 DWORD PTR [rdx+rcx+8], eax
+
+; 255  :     }
+
+  00ce1	e9 52 ff ff ff	 jmp	 $LN20@StubEntryP
+$LN21@StubEntryP:
+$LN49@StubEntryP:
+$LN52@StubEntryP:
+$_run$61:
+
+; 256  : _run:
+; 257  :     //PIMAGE_LOAD_CONFIG_DIRECTORY pLoadConfig_guest = (PIMAGE_LOAD_CONFIG_DIRECTORY)((BYTE*)lpOrigLoadAddress + pNt->OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_LOAD_CONFIG].VirtualAddress);
+; 258  :     //memcpy(pLoadConfig_guest, pLoadConfig_main, sizeof(IMAGE_LOAD_CONFIG_DIRECTORY));
+; 259  :     //memset(pLoadConfig_guest, 0, sizeof(IMAGE_LOAD_CONFIG_DIRECTORY));
+; 260  :     //
+; 261  :     HANDLE hDump = CreateFile("dump_by_stub.exe", GENERIC_WRITE, FILE_SHARE_WRITE, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+
+  00ce6	48 c7 44 24 30
+	00 00 00 00	 mov	 QWORD PTR [rsp+48], 0
+  00cef	c7 44 24 28 80
+	00 00 00	 mov	 DWORD PTR [rsp+40], 128	; 00000080H
+  00cf7	c7 44 24 20 02
+	00 00 00	 mov	 DWORD PTR [rsp+32], 2
+  00cff	45 33 c9	 xor	 r9d, r9d
+  00d02	41 b8 02 00 00
+	00		 mov	 r8d, 2
+  00d08	ba 00 00 00 40	 mov	 edx, 1073741824		; 40000000H
+  00d0d	48 8d 0d 00 00
+	00 00		 lea	 rcx, OFFSET FLAT:$SG96987
+  00d14	ff 15 00 00 00
+	00		 call	 QWORD PTR __imp_CreateFileA
+  00d1a	48 89 84 24 c8
+	01 00 00	 mov	 QWORD PTR hDump$[rsp], rax
+
+; 262  :     WriteFile(hDump, (BYTE*)lpOrigLoadAddress, pSec->PointerToRelocations, &bytes, NULL);
+
+  00d22	48 c7 44 24 20
+	00 00 00 00	 mov	 QWORD PTR [rsp+32], 0
+  00d2b	4c 8d 4c 24 40	 lea	 r9, QWORD PTR bytes$[rsp]
+  00d30	48 8b 84 24 90
+	00 00 00	 mov	 rax, QWORD PTR pSec$[rsp]
+  00d38	44 8b 40 18	 mov	 r8d, DWORD PTR [rax+24]
+  00d3c	48 8b 54 24 48	 mov	 rdx, QWORD PTR lpOrigLoadAddress$[rsp]
+  00d41	48 8b 8c 24 c8
+	01 00 00	 mov	 rcx, QWORD PTR hDump$[rsp]
+  00d49	ff 15 00 00 00
+	00		 call	 QWORD PTR __imp_WriteFile
+
+; 263  : 
+; 264  :     //pNt->OptionalHeader.ImageBase = (ULONGLONG)stub_load_address + (ULONGLONG)lpOrigLoadAddress;
+; 265  :     pNt->OptionalHeader.ImageBase = (ULONGLONG)stub_load_address;
+
+  00d4f	48 8b 44 24 58	 mov	 rax, QWORD PTR pNt$[rsp]
+  00d54	48 8b 8c 24 f0
+	00 00 00	 mov	 rcx, QWORD PTR stub_load_address$[rsp]
+  00d5c	48 89 48 30	 mov	 QWORD PTR [rax+48], rcx
+
+; 266  :     //BYTE* entryPoint = (BYTE*)stub_load_address + (ULONGLONG)lpOrigLoadAddress + pNt->OptionalHeader.AddressOfEntryPoint;
+; 267  :     BYTE* entryPoint = (BYTE*)lpOrigLoadAddress + pNt->OptionalHeader.AddressOfEntryPoint;
+
+  00d60	48 8b 44 24 58	 mov	 rax, QWORD PTR pNt$[rsp]
+  00d65	8b 40 28	 mov	 eax, DWORD PTR [rax+40]
+  00d68	48 8b 4c 24 48	 mov	 rcx, QWORD PTR lpOrigLoadAddress$[rsp]
+  00d6d	48 03 c8	 add	 rcx, rax
+  00d70	48 8b c1	 mov	 rax, rcx
+  00d73	48 89 84 24 d0
+	01 00 00	 mov	 QWORD PTR entryPoint$[rsp], rax
+
+; 268  : 
+; 269  :     DWORD oldProtect;
+; 270  :     if (!VirtualProtect(lpOrigLoadAddress, pSec->PointerToRelocations, PAGE_EXECUTE_READ, &oldProtect)) {
+
+  00d7b	48 8b 84 24 90
+	00 00 00	 mov	 rax, QWORD PTR pSec$[rsp]
+  00d83	8b 40 18	 mov	 eax, DWORD PTR [rax+24]
+  00d86	4c 8d 8c 24 78
+	01 00 00	 lea	 r9, QWORD PTR oldProtect$[rsp]
+  00d8e	41 b8 20 00 00
+	00		 mov	 r8d, 32			; 00000020H
+  00d94	8b d0		 mov	 edx, eax
+  00d96	48 8b 4c 24 48	 mov	 rcx, QWORD PTR lpOrigLoadAddress$[rsp]
+  00d9b	ff 15 00 00 00
+	00		 call	 QWORD PTR __imp_VirtualProtect
+  00da1	85 c0		 test	 eax, eax
+  00da3	75 02		 jne	 SHORT $LN53@StubEntryP
+
+; 271  :         return;
+
+  00da5	eb 07		 jmp	 SHORT $LN1@StubEntryP
+$LN53@StubEntryP:
+
+; 272  :     }
+; 273  :     ((void(*)())entryPoint)();
+
+  00da7	ff 94 24 d0 01
+	00 00		 call	 QWORD PTR entryPoint$[rsp]
 $LN1@StubEntryP:
 
-; 69   : }
+; 274  : }
 
-  00211	48 81 c4 d8 00
-	00 00		 add	 rsp, 216		; 000000d8H
-  00218	c3		 ret	 0
+  00dae	48 81 c4 f8 01
+	00 00		 add	 rsp, 504		; 000001f8H
+  00db5	c3		 ret	 0
 ?StubEntryPoint@@YAXXZ ENDP				; StubEntryPoint
+_TEXT	ENDS
+; Function compile flags: /Odtp
+; File D:\licenta\mypacker\stub\stub.cpp
+_TEXT	SEGMENT
+hModule$ = 32
+?GetDLLLoadAddress@@YA_KXZ PROC				; GetDLLLoadAddress
+
+; 18   : unsigned long long GetDLLLoadAddress() {
+
+$LN4:
+  00000	48 83 ec 38	 sub	 rsp, 56			; 00000038H
+
+; 19   :     HMODULE hModule;
+; 20   :     if (!GetModuleHandleEx(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS | GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT,
+
+  00004	4c 8d 44 24 20	 lea	 r8, QWORD PTR hModule$[rsp]
+  00009	48 8d 15 00 00
+	00 00		 lea	 rdx, OFFSET FLAT:?GetDLLLoadAddress@@YA_KXZ ; GetDLLLoadAddress
+  00010	b9 06 00 00 00	 mov	 ecx, 6
+  00015	ff 15 00 00 00
+	00		 call	 QWORD PTR __imp_GetModuleHandleExA
+  0001b	85 c0		 test	 eax, eax
+  0001d	75 04		 jne	 SHORT $LN2@GetDLLLoad
+
+; 21   :                            (LPCTSTR) &GetDLLLoadAddress, // Pass any address within the DLL
+; 22   :                            &hModule)) {
+; 23   :         return 0; // Failed to get the module handle
+
+  0001f	33 c0		 xor	 eax, eax
+  00021	eb 05		 jmp	 SHORT $LN1@GetDLLLoad
+$LN2@GetDLLLoad:
+
+; 24   :     }
+; 25   :     return (unsigned long long)hModule;
+
+  00023	48 8b 44 24 20	 mov	 rax, QWORD PTR hModule$[rsp]
+$LN1@GetDLLLoad:
+
+; 26   : }
+
+  00028	48 83 c4 38	 add	 rsp, 56			; 00000038H
+  0002c	c3		 ret	 0
+?GetDLLLoadAddress@@YA_KXZ ENDP				; GetDLLLoadAddress
 _TEXT	ENDS
 END

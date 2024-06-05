@@ -5,7 +5,7 @@
 #include <process.h>
 
 #pragma data_seg(".A$A")
-//__declspec(allocate(".A$A")) extern struct GlobalExternVariables genv = {};
+__declspec(dllexport)__declspec(allocate(".A$A")) extern struct GlobalExternVariables genv = {};
 #pragma data_seg()
 
 #pragma comment(linker, "/MERGE:.rdata=.A")
@@ -15,11 +15,22 @@
 #pragma comment(lib, "kernel32.lib")
 #pragma comment ( linker, "/entry:\"StubEntryPoint\"")
 
+unsigned long long GetDLLLoadAddress() {
+    HMODULE hModule;
+    if (!GetModuleHandleEx(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS | GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT,
+                           (LPCTSTR) &GetDLLLoadAddress, // Pass any address within the DLL
+                           &hModule)) {
+        return 0; // Failed to get the module handle
+    }
+    return (unsigned long long)hModule;
+}
 
 void __declspec(noinline) StubEntryPoint() {
 
     HANDLE hLog = CreateFile("log.txt", FILE_APPEND_DATA, FILE_SHARE_WRITE, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
     long unsigned int bytes = 0;
+    unsigned long long stub_load_address = GetDLLLoadAddress();
+    WriteFile(hLog, &stub_load_address, 8, &bytes, NULL);
 
     HMODULE brieflzDLL = LoadLibraryA("brieflz.dll");
     HMODULE msvcrtDLL = LoadLibraryA("msvcrt.dll");
@@ -179,7 +190,8 @@ _delayed:
         delayloadDescriptor += 1;
     }
 _reloc:
-    ULONGLONG delta = (ULONGLONG)((ULONGLONG)lpOrigLoadAddress - pNt->OptionalHeader.ImageBase);
+    //ULONGLONG delta = (ULONGLONG)((ULONGLONG)lpOrigLoadAddress + (ULONGLONG)stub_load_address - pNt->OptionalHeader.ImageBase);
+    ULONGLONG delta = (ULONGLONG)((ULONGLONG)stub_load_address - pNt->OptionalHeader.ImageBase);
     PIMAGE_DATA_DIRECTORY relocationDirectory = &pNt->OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_BASERELOC];
     if (!relocationDirectory->Size) {
        // goto _exception;
@@ -209,7 +221,8 @@ _reloc:
             WriteFile(hLog, "\n", 1, &bytes, NULL);
             //debug
             if(type == IMAGE_REL_BASED_DIR64) {
-                *(ULONGLONG*)(relocationBase + offset) += (ULONGLONG)load_address + (ULONGLONG) lpOrigLoadAddress;
+                //*(ULONGLONG*)(relocationBase + offset) += (ULONGLONG)stub_load_address + (ULONGLONG) lpOrigLoadAddress;
+                *(ULONGLONG*)(relocationBase + offset) += (ULONGLONG)stub_load_address;
                 //ULONGLONG* fixup = (ULONGLONG*)(relocationBase + offset);
                 //debug
                 //WriteFile(hLog, (relocationBase + offset), 8, &bytes, NULL);
@@ -227,7 +240,6 @@ _reloc:
         relocation = (PIMAGE_BASE_RELOCATION)((BYTE*)relocation + relocation->SizeOfBlock);
     }
    Sleep(30000);
-   /*
 _exception:
     PIMAGE_DATA_DIRECTORY exceptionDirectory = &pNt->OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_EXCEPTION];
     if (!exceptionDirectory->Size) {
@@ -241,7 +253,6 @@ _exception:
         functionEntries[i].EndAddress += delta;
         functionEntries[i].UnwindData += delta;
     }
-    */
 _run:
     //PIMAGE_LOAD_CONFIG_DIRECTORY pLoadConfig_guest = (PIMAGE_LOAD_CONFIG_DIRECTORY)((BYTE*)lpOrigLoadAddress + pNt->OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_LOAD_CONFIG].VirtualAddress);
     //memcpy(pLoadConfig_guest, pLoadConfig_main, sizeof(IMAGE_LOAD_CONFIG_DIRECTORY));
@@ -250,7 +261,9 @@ _run:
     HANDLE hDump = CreateFile("dump_by_stub.exe", GENERIC_WRITE, FILE_SHARE_WRITE, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
     WriteFile(hDump, (BYTE*)lpOrigLoadAddress, pSec->PointerToRelocations, &bytes, NULL);
 
-    pNt->OptionalHeader.ImageBase = (ULONGLONG)lpOrigLoadAddress;
+    //pNt->OptionalHeader.ImageBase = (ULONGLONG)stub_load_address + (ULONGLONG)lpOrigLoadAddress;
+    pNt->OptionalHeader.ImageBase = (ULONGLONG)stub_load_address;
+    //BYTE* entryPoint = (BYTE*)stub_load_address + (ULONGLONG)lpOrigLoadAddress + pNt->OptionalHeader.AddressOfEntryPoint;
     BYTE* entryPoint = (BYTE*)lpOrigLoadAddress + pNt->OptionalHeader.AddressOfEntryPoint;
 
     DWORD oldProtect;
