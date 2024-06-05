@@ -1194,7 +1194,7 @@ $LN33@StubEntryP:
 
   0095a	48 8b 44 24 60	 mov	 rax, QWORD PTR pNt$[rsp]
   0095f	48 8b 4c 24 48	 mov	 rcx, QWORD PTR lpOrigLoadAddress$[rsp]
-  00964	48 89 48 30	 mov	 QWORD PTR [rax+48], rcx -> aici crapa (deci eu am schimbat permisiunile sa nu mai aiba write si dupa am scris ca o tampita)
+  00964	48 89 48 30	 mov	 QWORD PTR [rax+48], rcx -> aici crapa (deci eu am schimbat permisiunile sa nu mai aiba write si dupa am scris ca o duda)
 
 ; 250  :     BYTE* entryPoint = (BYTE*)lpOrigLoadAddress + pNt->OptionalHeader.AddressOfEntryPoint;
 
