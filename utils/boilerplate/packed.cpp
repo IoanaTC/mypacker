@@ -33,7 +33,7 @@ __attribute__((force_align_arg_pointer))
         if(!CloseHandle(hTempDll)) return;
 
         HMODULE hStubDll = LoadLibraryA("stub.dll");
-        Sleep(300000);
+        //Sleep(300000); -> debug
         // delete, free
         return;
     }
