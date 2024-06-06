@@ -239,7 +239,7 @@ _reloc:
         }
         relocation = (PIMAGE_BASE_RELOCATION)((BYTE*)relocation + relocation->SizeOfBlock);
     }
-   Sleep(30000);
+   //Sleep(30000); -> debug
 _exception:
     PIMAGE_DATA_DIRECTORY exceptionDirectory = &pNt->OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_EXCEPTION];
     if (!exceptionDirectory->Size) {
