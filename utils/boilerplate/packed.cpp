@@ -1,11 +1,6 @@
 #include <windows.h>
-#include <iostream>
 using namespace std;
 #define IDR_STUBDLL 101
-
-struct GlobalExternVariables {
-    unsigned long long stub_load_address;
-};
 
 __attribute__((force_align_arg_pointer))
     void _start() {
@@ -33,8 +28,15 @@ __attribute__((force_align_arg_pointer))
         if(!CloseHandle(hTempDll)) return;
 
         HMODULE hStubDll = LoadLibraryA("stub.dll");
-        //Sleep(300000); -> debug
-        // delete, free
+
+        typedef void (*StubLoadPeFunction)();
+        StubLoadPeFunction loadPE = (StubLoadPeFunction)GetProcAddress(hStubDll, "StubLoadPE");
+
+        if(!loadPE) return;
+        loadPE();
+
+        FreeLibrary(hStubDll);
+        DeleteFileA("stub.dll");
         return;
     }
 #pragma comment(linker, "/entry:\"_start\"")
