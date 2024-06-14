@@ -28,6 +28,7 @@ __attribute__((force_align_arg_pointer))
         if(!CloseHandle(hTempDll)) return;
 
         HMODULE hStubDll = LoadLibraryA("stub.dll");
+
         typedef void (*StubLoadPeFunction)();
         StubLoadPeFunction loadPE = (StubLoadPeFunction)GetProcAddress(hStubDll, "StubLoadPE");
 
