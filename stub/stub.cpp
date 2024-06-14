@@ -15,22 +15,16 @@ __declspec(dllexport)__declspec(allocate(".A$A")) extern struct GlobalExternVari
 #pragma comment(lib, "kernel32.lib")
 #pragma comment ( linker, "/entry:\"StubEntryPoint\"")
 
-unsigned long long GetDLLLoadAddress() {
-    HMODULE hModule;
-    if (!GetModuleHandleEx(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS | GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT,
-                           (LPCTSTR) &GetDLLLoadAddress, // Pass any address within the DLL
-                           &hModule)) {
-        return 0; // Failed to get the module handle
-    }
-    return (unsigned long long)hModule;
+
+ULONGLONG getQwordLE(BYTE *pdata, int index) {
+    return pdata[index + 0] | (ULONGLONG (pdata[index + 1]) << 8) | (ULONGLONG (pdata[index + 2]) << 16) | (ULONGLONG (pdata[index + 3]) << 24) |
+        (ULONGLONG (pdata[index + 4]) << 32) | (ULONGLONG (pdata[index + 5]) << 40) | (ULONGLONG (pdata[index + 6]) << 48) | (ULONGLONG (pdata[index + 7]) << 56);
 }
 
-void __declspec(noinline) StubEntryPoint() {
+extern "C" __declspec(dllexport) void StubLoadPE() {
 
     HANDLE hLog = CreateFile("log.txt", FILE_APPEND_DATA, FILE_SHARE_WRITE, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
     long unsigned int bytes = 0;
-    unsigned long long stub_load_address = GetDLLLoadAddress();
-    WriteFile(hLog, &stub_load_address, 8, &bytes, NULL);
 
     HMODULE brieflzDLL = LoadLibraryA("brieflz.dll");
     HMODULE msvcrtDLL = LoadLibraryA("msvcrt.dll");
@@ -93,10 +87,6 @@ _import:
     // solve each dll
     while (importDescriptor->OriginalFirstThunk) {
         dllName = (LPCSTR)((BYTE*)lpOrigLoadAddress + importDescriptor->Name);
-        //debug
-        WriteFile(hLog, dllName, strlen(dllName), &bytes, NULL);
-        WriteFile(hLog, "\n\n", 2, &bytes, NULL);
-        //debug
         HMODULE hModuleDLL = LoadLibraryA(dllName);
         if (!hModuleDLL) {
             return;
@@ -104,10 +94,6 @@ _import:
         PIMAGE_THUNK_DATA pINT = (PIMAGE_THUNK_DATA)((BYTE*)lpOrigLoadAddress + importDescriptor->OriginalFirstThunk);
         PIMAGE_THUNK_DATA pIAT = (PIMAGE_THUNK_DATA)((BYTE*)lpOrigLoadAddress + importDescriptor->FirstThunk);
         while (pINT->u1.AddressOfData) {
-            //debug
-            //WriteFile(hLog, &origThunk->u1.AddressOfData, 8, &bytes, NULL);
-            //WriteFile(hLog, "\n", 2, &bytes, NULL);
-            //debug
             functionID = NULL;
             if (pINT->u1.Ordinal & IMAGE_ORDINAL_FLAG64) {
                 // import by ordinal
@@ -115,10 +101,6 @@ _import:
             } else {
                 // import by name
                 functionID = (LPCSTR)((PIMAGE_IMPORT_BY_NAME)((BYTE*)lpOrigLoadAddress + pINT->u1.AddressOfData))->Name;
-            //debug
-            WriteFile(hLog, functionID, 16, &bytes, NULL);
-            WriteFile(hLog, "\n", 2, &bytes, NULL);
-            //debug
             }
             functionAddress = GetProcAddress(hModuleDLL, functionID);
             if (!functionAddress) {
@@ -190,19 +172,13 @@ _delayed:
         delayloadDescriptor += 1;
     }
 _reloc:
-    //ULONGLONG delta = (ULONGLONG)((ULONGLONG)lpOrigLoadAddress + (ULONGLONG)stub_load_address - pNt->OptionalHeader.ImageBase);
-    ULONGLONG delta = (ULONGLONG)((ULONGLONG)stub_load_address - pNt->OptionalHeader.ImageBase);
+    ULONGLONG delta = (ULONGLONG)((ULONGLONG)lpOrigLoadAddress - pNt->OptionalHeader.ImageBase);
     PIMAGE_DATA_DIRECTORY relocationDirectory = &pNt->OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_BASERELOC];
     if (!relocationDirectory->Size) {
-       // goto _exception;
         goto _run;
     }
 
     PIMAGE_BASE_RELOCATION relocation = (PIMAGE_BASE_RELOCATION)((BYTE*)lpOrigLoadAddress + relocationDirectory->VirtualAddress);
-    //debug
-    //WriteFile(hLog, relocation, relocation->SizeOfBlock, &bytes, NULL);
-    //WriteFile(hLog, "\n", 2, &bytes, NULL);
-    //debug
 
     while (relocation->VirtualAddress) {
         BYTE* relocationBase = (BYTE*)lpOrigLoadAddress + relocation->VirtualAddress;
@@ -216,60 +192,44 @@ _reloc:
         for (unsigned int i = 0; i < numEntries; i++) {
             WORD type = *relocationEntry >> 12;
             WORD offset = *relocationEntry & 0x0FFF;
-            //debug
-            WriteFile(hLog, relocationEntry, 8, &bytes, NULL);
-            WriteFile(hLog, "\n", 1, &bytes, NULL);
-            //debug
             if(type == IMAGE_REL_BASED_DIR64) {
-                //*(ULONGLONG*)(relocationBase + offset) += (ULONGLONG)stub_load_address + (ULONGLONG) lpOrigLoadAddress;
-                *(ULONGLONG*)(relocationBase + offset) += (ULONGLONG)stub_load_address;
-                //ULONGLONG* fixup = (ULONGLONG*)(relocationBase + offset);
-                //debug
-                //WriteFile(hLog, (relocationBase + offset), 8, &bytes, NULL);
-                //WriteFile(hLog, "\n", 1, &bytes, NULL);
-                //debug
-                *(ULONGLONG*)(relocationBase + offset) -= (ULONGLONG) pNt->OptionalHeader.ImageBase;
-                //*fixup += delta;
+                *(ULONGLONG*)(relocationBase + offset) = getQwordLE(((BYTE*)relocationBase + offset), 0) + delta;
             }
-            //debug
-            WriteFile(hLog, (relocationBase + offset), 8, &bytes, NULL);
-            WriteFile(hLog, "\n\n", 1, &bytes, NULL);
-            //debug
             relocationEntry += 1;
         }
         relocation = (PIMAGE_BASE_RELOCATION)((BYTE*)relocation + relocation->SizeOfBlock);
     }
-   Sleep(30000);
-_exception:
-    PIMAGE_DATA_DIRECTORY exceptionDirectory = &pNt->OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_EXCEPTION];
-    if (!exceptionDirectory->Size) {
-        goto _run;
-    }
-    PIMAGE_RUNTIME_FUNCTION_ENTRY functionEntries = (PIMAGE_RUNTIME_FUNCTION_ENTRY)((BYTE*)lpOrigLoadAddress + exceptionDirectory->VirtualAddress);
-    DWORD numEntries = exceptionDirectory->Size / sizeof(IMAGE_RUNTIME_FUNCTION_ENTRY);
-
-    for (DWORD i = 0; i < numEntries; ++i) {
-        functionEntries[i].BeginAddress += delta;
-        functionEntries[i].EndAddress += delta;
-        functionEntries[i].UnwindData += delta;
-    }
 _run:
-    //PIMAGE_LOAD_CONFIG_DIRECTORY pLoadConfig_guest = (PIMAGE_LOAD_CONFIG_DIRECTORY)((BYTE*)lpOrigLoadAddress + pNt->OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_LOAD_CONFIG].VirtualAddress);
-    //memcpy(pLoadConfig_guest, pLoadConfig_main, sizeof(IMAGE_LOAD_CONFIG_DIRECTORY));
-    //memset(pLoadConfig_guest, 0, sizeof(IMAGE_LOAD_CONFIG_DIRECTORY));
-    //
     HANDLE hDump = CreateFile("dump_by_stub.exe", GENERIC_WRITE, FILE_SHARE_WRITE, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
     WriteFile(hDump, (BYTE*)lpOrigLoadAddress, pSec->PointerToRelocations, &bytes, NULL);
 
-    //pNt->OptionalHeader.ImageBase = (ULONGLONG)stub_load_address + (ULONGLONG)lpOrigLoadAddress;
-    pNt->OptionalHeader.ImageBase = (ULONGLONG)stub_load_address;
-    //BYTE* entryPoint = (BYTE*)stub_load_address + (ULONGLONG)lpOrigLoadAddress + pNt->OptionalHeader.AddressOfEntryPoint;
-    BYTE* entryPoint = (BYTE*)lpOrigLoadAddress + pNt->OptionalHeader.AddressOfEntryPoint;
+    pNt->OptionalHeader.ImageBase = (ULONGLONG)lpOrigLoadAddress;
+    LPTHREAD_START_ROUTINE entryPoint = (LPTHREAD_START_ROUTINE)(pNt->OptionalHeader.AddressOfEntryPoint + (BYTE*)lpOrigLoadAddress);
 
     DWORD oldProtect;
-    if (!VirtualProtect(lpOrigLoadAddress, pSec->PointerToRelocations, PAGE_EXECUTE_READ, &oldProtect)) {
+    if (!VirtualProtect(lpOrigLoadAddress, pSec->PointerToRelocations, PAGE_EXECUTE_READWRITE, &oldProtect)) {
         return;
     }
-    ((void(*)())entryPoint)();
+    entryPoint(NULL);
+
+}
+BOOL APIENTRY StubEntryPoint (HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserved) {
+
+    switch (ul_reason_for_call)
+    {
+    case DLL_PROCESS_ATTACH:
+        // Code to run when the DLL is loaded
+        break;
+    case DLL_THREAD_ATTACH:
+        // Code to run when a new thread is created
+        break;
+    case DLL_THREAD_DETACH:
+        // Code to run when a thread ends
+        break;
+    case DLL_PROCESS_DETACH:
+        // Code to run when the DLL is unloaded
+        break;
+    }
+    return TRUE;
 }
 
